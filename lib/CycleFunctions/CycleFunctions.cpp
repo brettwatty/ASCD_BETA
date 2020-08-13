@@ -396,7 +396,7 @@ void Cycle::dischargeCycle(byte module)
             outputLCD.batteryDischargeLCD(module, batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
         }
 #if defined(ONLINE)
-        serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module));
+        serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module), milliOhms[module]);
 #endif
     }
     else
@@ -404,7 +404,7 @@ void Cycle::dischargeCycle(byte module)
         dischargeCompleted = true;
         writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
 #if defined(ONLINE)
-        serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module));
+        serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module), milliOhms[module]);
         if (serialWIFI.getInsertDataFlag(module))
         {
             nextCycle(module);

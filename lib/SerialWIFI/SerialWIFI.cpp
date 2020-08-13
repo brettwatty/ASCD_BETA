@@ -59,9 +59,9 @@ void SerialWIFI::batteryRestSerial(byte module, int milliOhms, byte batteryTemp,
 	sprintf_P(serialSendString + strlen(serialSendString), PSTR("&CS%d=4&TI%d=%d&CT%d=%d&CV%d=%d.%02d"), module, module, (seconds + (minutes * 60) + (hours * 3600)), module, batteryTemp, module, (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
 }
 
-void SerialWIFI::batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, float batteryInitialVoltage, byte batteryTemp, float batteryVoltage, float dischargeAmps, float dischargeMilliamps, byte batteryHighestTemp)
+void SerialWIFI::batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, float batteryInitialVoltage, byte batteryTemp, float batteryVoltage, float dischargeAmps, float dischargeMilliamps, byte batteryHighestTemp, int milliOhms)
 {
-	sprintf_P(serialSendString + strlen(serialSendString), PSTR("&CS%d=5&TI%d=%d&IT%d=%d&IV%d=%d.%02d&CT%d=%d&CV%d=%d.%02d&HT%d=%d&MA%d=%d&DA%d=%d.%02d&MO%d=%d"), module, module, (seconds + (minutes * 60) + (hours * 3600)), module, batteryInitialTemp, module, (int)batteryInitialVoltage, (int)(batteryInitialVoltage * 100) % 100, module, batteryTemp, module, (int)batteryVoltage, (int)(batteryVoltage * 100) % 100, module, batteryHighestTemp, module, (int)dischargeMilliamps, module, (int)dischargeAmps, (int)(dischargeAmps * 100) % 100, module); // , (int)milliOhmsValue
+	sprintf_P(serialSendString + strlen(serialSendString), PSTR("&CS%d=5&TI%d=%d&IT%d=%d&IV%d=%d.%02d&CT%d=%d&CV%d=%d.%02d&HT%d=%d&MA%d=%d&DA%d=%d.%02d&MO%d=%d"), module, module, (seconds + (minutes * 60) + (hours * 3600)), module, batteryInitialTemp, module, (int)batteryInitialVoltage, (int)(batteryInitialVoltage * 100) % 100, module, batteryTemp, module, (int)batteryVoltage, (int)(batteryVoltage * 100) % 100, module, batteryHighestTemp, module, (int)dischargeMilliamps, module, (int)dischargeAmps, (int)(dischargeAmps * 100) % 100, module, milliOhms);
 }
 
 void SerialWIFI::completeSerial(byte module, byte faultCode, float batteryVoltage)

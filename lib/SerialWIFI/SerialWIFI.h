@@ -31,7 +31,7 @@ public:
     void batteryChargeSerial(byte module, bool chargeRecharge, byte batteryInitialTemp, float batteryInitialVoltage, byte batteryTemp, byte hours, byte minutes, byte seconds, float batteryVoltage, byte batteryHighestTemp);
     void milliOhmsSerial(byte module, int milliOhms, float batteryVoltage);
     void batteryRestSerial(byte module, int milliOhms, byte batteryTemp, byte hours, byte minutes, byte seconds, float batteryVoltage);
-    void batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, float batteryInitialVoltage, byte batteryTemp, float batteryVoltage, float dischargeAmps, float dischargeMilliamps, byte batteryHighestTemp);
+    void batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, float batteryInitialVoltage, byte batteryTemp, float batteryVoltage, float dischargeAmps, float dischargeMilliamps, byte batteryHighestTemp, int milliOhms);
     void completeSerial(byte module, byte faultCode, float batteryVoltage);
     boolean getBarcodeScanned(byte module);
     void resetBarcodeScanned(byte module);
