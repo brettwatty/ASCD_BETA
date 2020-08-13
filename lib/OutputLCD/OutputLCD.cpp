@@ -1,0 +1,152 @@
+#include <OutputLCD.h>
+#include <LiquidCrystal_I2C.h>
+#include <Variables.h>
+#if defined(ASCD_MEGA_8X)
+LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 20 chars and 4 line display
+#elif defined(ASCD_NANO_4X)
+LiquidCrystal_I2C lcd(0x27, 16, 2); // set the LCD address to 0x27 for a 16 chars and 2 line display
+#endif
+
+OutputLCD::OutputLCD()
+{
+}
+
+void OutputLCD::init()
+{
+    lcd.init();
+    lcd.clear();
+    lcd.backlight(); // Turn on backlight
+}
+
+void OutputLCD::displayLCDCycle()
+{
+#if defined(ASCD_MEGA_8X)
+    lcd.setCursor(0, 0);
+    lcd.print(lcdLine0);
+    lcd.setCursor(0, 1);
+    lcd.print(lcdLine1);
+    lcd.setCursor(0, 2);
+    lcd.print(lcdLine2);
+    lcd.setCursor(0, 3);
+    lcd.print(lcdLine3);
+#elif defined(ASCD_NANO_4X)
+    lcd.setCursor(0, 0);
+    lcd.print(lcdLine0);
+    lcd.setCursor(0, 1);
+    lcd.print(lcdLine1);
+#endif
+}
+
+void OutputLCD::startup()
+{
+#if defined(ASCD_MEGA_8X)
+    sprintf_P(lcdLine0, PSTR("%-20S"), PSTR("ASCD MEGA 8X V2.0.0"));
+    sprintf_P(lcdLine1, PSTR("%-20S"), PSTR("INIT TP4056........."));
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%-16S"), PSTR("ASCD NANO V2.0.0"));
+    sprintf_P(lcdLine1, PSTR("%-16S"), PSTR("Init TP5100....."));
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::batteryCheckLCD(byte module, float batteryVoltage)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-BATTERY CHECK"));
+    sprintf_P(lcdLine1, PSTR("%-11S%d.%02dV"), PSTR("INSERT BAT"), (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::batteryBarcodeLCD(byte module, float batteryVoltage)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-SCAN BARCODE"));
+    sprintf_P(lcdLine1, PSTR("%-11S%d.%02dV"), PSTR(" "), (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::batteryChargeLCD(byte module, bool chargeRecharge, float batteryVoltage, float batteryInitialVoltage, byte batteryTemp, byte hours, byte minutes, byte seconds)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-7S%02d:%02d:%02d"), module + 1, ((chargeRecharge) ? PSTR("-CHRG ") : PSTR("-RCHG ")), hours, minutes, seconds);
+    // if (chargeRecharge)
+    // {
+    //     sprintf_P(lcdLine0, PSTR("%d%-7S%02d:%02d:%02d"), module + 1, PSTR("-CHRG "), hours, minutes, seconds);
+    // }
+    // else
+    // {
+    //     sprintf_P(lcdLine0, PSTR("%d%-7S%02d:%02d:%02d"), module + 1, PSTR("-RCHG "), hours, minutes, seconds);
+    // }
+    sprintf_P(lcdLine1, PSTR("%d.%02dV  %02d%c %d.%02dV"), (int)batteryInitialVoltage, (int)(batteryInitialVoltage * 100) % 100, batteryTemp, 223, (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::milliOhmsLCD(byte module, int milliOhms)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-RESISTANCE"));
+    sprintf_P(lcdLine1, PSTR("%-10S%04dm%c"), PSTR("MILLIOHMS"), (int)milliOhms, 244);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::batteryRestLCD(byte module, float batteryVoltage, byte hours, byte minutes, byte seconds)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-7S%02d:%02d:%02d"), module + 1, PSTR("-REST"), hours, minutes, seconds);
+    sprintf_P(lcdLine1, PSTR("%-11S%d.%02dV"), PSTR(" "), (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::batteryDischargeLCD(byte module, float batteryVoltage, float dischargeAmps, float dischargeMilliamps, byte batteryTemp, byte hours, byte minutes, byte seconds)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    sprintf_P(lcdLine0, PSTR("%d%-4S%d.%02dA %d.%02dV"), module + 1, PSTR("-DC"), (int)dischargeAmps, (int)(dischargeAmps * 100) % 100, (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+    sprintf_P(lcdLine1, PSTR("%02d:%02d:%02d %04dmAh"), hours, minutes, seconds, (int)dischargeMilliamps);
+#endif
+    displayLCDCycle();
+}
+
+void OutputLCD::completeLCD(byte module, byte faultCode, int milliOhms, float dischargeMilliamps, float batteryVoltage)
+{
+#if defined(ASCD_MEGA_8X)
+
+#elif defined(ASCD_NANO_4X)
+    switch (faultCode)
+    {
+    case 0: // Finished
+        sprintf_P(lcdLine0, PSTR("%d%-9S %d.%02dV"), module + 1, PSTR("-FINISHED"), (int)batteryVoltage, (int)(batteryVoltage * 100) % 100);
+        break;
+    case 3: // High Milli Ohms
+        sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-FAULT HIGH OHM"));
+        break;
+    case 5: // Low Milliamps
+        sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-FAULT LOW mAh"));
+        break;
+    case 7: // High Temperature
+        sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-FAULT HIGH TMP"));
+        break;
+    case 9: // Charge Timeout
+        sprintf_P(lcdLine0, PSTR("%d%-15S"), module + 1, PSTR("-FAULT CHG TIME"));
+        break;
+    }
+    sprintf_P(lcdLine1, PSTR("%04dm%c   %04dmAh"), (int)milliOhms, 244, (int)dischargeMilliamps);
+#endif
+    displayLCDCycle();
+}

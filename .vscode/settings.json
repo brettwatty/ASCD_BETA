@@ -1,0 +1,26 @@
+{
+    "cSpell.ignoreWords": [
+        "ascd",
+        "milliamps",
+        "println"
+    ],
+    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.dimInactiveRegions": false,
+    "cSpell.words": [
+        "ADCH",
+        "ADCL",
+        "ADMUX",
+        "ADSC",
+        "CHRG",
+        "COMPA",
+        "OCIE",
+        "RCHG",
+        "TCCR",
+        "TCNT",
+        "TIMSK",
+        "Ttiny",
+        "Vref",
+        "WIFI",
+        "vect"
+    ]
+}
