@@ -3,3 +3,10 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+.vscode/extentions.json
+.vscode/settings.json
+dump/
+.gitignore
+test/
+include/
+.travis.yml
