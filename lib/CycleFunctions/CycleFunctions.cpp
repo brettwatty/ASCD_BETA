@@ -186,7 +186,7 @@ void Cycle::nextCycle(byte module)
         break;
 
     case 5: // Discharge Battery
-        dischargeCompleted = false;
+        dischargeCompleted[module] = false;
         if (dischargeMilliamps[module] < lowMilliAmps) // No need to recharge the battery if it has low Milliamps
         {
             faultCode[module] = 5; // Set the Battery Fault Code to 5 Low Milliamps
@@ -211,7 +211,7 @@ void Cycle::nextCycle(byte module)
         dischargeAmps = 0.00;
         dischargeMilliamps[module] = 0.00;
         milliOhms[module] = 0;
-        dischargeCompleted = false;
+        dischargeCompleted[module] = false;
         batteryInitialVoltage[module] = 0.00;
         cycleState[module] = 0; // Restart cycle back to detect battery
 #if defined(ONLINE)
@@ -375,7 +375,7 @@ void Cycle::dischargeCycle(byte module)
     dischargeAmps = 0.00;
     batteryShuntVoltage = 0.00;
     batteryVoltage = readInput.batteryVoltage(module);
-    if (batteryVoltage >= defaultBatteryCutOffVoltage && dischargeCompleted == false)
+    if (batteryVoltage >= defaultBatteryCutOffVoltage && dischargeCompleted[module] == false)
     {
         writeOutput.dischargeMosfetOn(module); // Turn on the Discharge Mosfet
         batteryVoltage = readInput.batteryVoltage(module);
@@ -401,7 +401,7 @@ void Cycle::dischargeCycle(byte module)
     }
     else
     {
-        dischargeCompleted = true;
+        dischargeCompleted[module] = true;
         writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
 #if defined(ONLINE)
         serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module), milliOhms[module]);
