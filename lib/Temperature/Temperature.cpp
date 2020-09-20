@@ -10,11 +10,11 @@ OneWire oneWire(ONE_WIRE_BUS);       // Setup a oneWire instance to communicate 
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
 
 DeviceAddress tempSensorSerial[modulesCount + 1] =
-    {{0x28, 0xE3, 0x11, 0x79, 0xA2, 0x01, 0x03, 0x7B},
-     {0x28, 0x84, 0x35, 0x79, 0xA2, 0x01, 0x03, 0xDA},
-     {0x28, 0xCF, 0x41, 0x79, 0xA2, 0x01, 0x03, 0x25},
-     {0x28, 0xA4, 0x8A, 0x79, 0xA2, 0x00, 0x03, 0x88},
-     {0x28, 0xB9, 0x84, 0x79, 0xA2, 0x00, 0x03, 0x3B}};
+    {{0x28, 0xFF, 0x64, 0x18, 0xD0, 0x76, 0x39, 0x45},
+     {0x28, 0xFF, 0x64, 0x18, 0xD0, 0x66, 0x61, 0xB0},
+     {0x28, 0xFF, 0x64, 0x1D, 0xF8, 0x70, 0x6B, 0xB8},
+     {0x28, 0xFF, 0x64, 0x18, 0xD0, 0x66, 0x44, 0xAC},
+     {0x28, 0xFF, 0x64, 0x18, 0xD0, 0x79, 0x6A, 0x64}};
 Temperature::Temperature()
 {
 }
@@ -51,7 +51,7 @@ byte Temperature::processTemperature(byte module)
 
 void Temperature::getTemperature(byte module, boolean tempNow)
 {
-    if (tempCount[module] > 16 || batteryCurrentTemp[module] == 0 || batteryCurrentTemp[module] == 99 || tempNow) // Read every 16x cycles
+    if (tempCount[module] > 16 || batteryCurrentTemp[module] == 0 || batteryCurrentTemp[module] == 99 || tempNow) // Read every 16x cycles or if tempNow = true
     {
         tempCount[module] = 0;
         sensors.requestTemperaturesByAddress(tempSensorSerial[module]);
@@ -62,7 +62,7 @@ void Temperature::getTemperature(byte module, boolean tempNow)
             if (batteryCurrentTemp[module] != 99)
                 tempC = batteryCurrentTemp[module];
         }
-        batteryCurrentTemp[module] = (int)tempC;
+        batteryCurrentTemp[module] = (int)tempC + temperatureOffset[module];
     }
     else
     {
