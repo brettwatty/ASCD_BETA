@@ -5,7 +5,7 @@ Buzzer::Buzzer()
 
 void Buzzer::init()
 {
-    // buzzerStart();
+    buzzerStart();
 }
 
 void Buzzer::buzzerStart()
@@ -19,7 +19,7 @@ void Buzzer::buzzerStart()
 
 void Buzzer::buzzerFinished()
 {
-    for (int i = 500; i < 3000; i += 300)
+    for (int i = 3000; i > 500; i -= 300)
     {
         tone(BUZZ, i, 30);
         delay(50);

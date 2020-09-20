@@ -24,7 +24,7 @@ private:
     float dischargeAmps = 0.00;
     float dischargeMilliamps[modulesCount];
     int dischargeMillisTime = 0;
-    boolean dischargeCompleted[modulesCount] = false;
+    boolean dischargeCompleted[modulesCount];
     unsigned long dischargeMilliSecondsPrevious[modulesCount];
 
     int milliOhms[modulesCount];

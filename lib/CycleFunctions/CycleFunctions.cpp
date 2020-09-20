@@ -24,7 +24,7 @@ void Cycle::init()
         delay(500);
         readInput.batteryVoltage(module);
         readInput.batteryVoltageDrop(module);
-        writeOutput.chargeMosfetOff(module);
+        writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
         delay(500);
         readInput.batteryVoltage(module);
         readInput.batteryVoltageDrop(module);
@@ -32,7 +32,7 @@ void Cycle::init()
     }
     temperature.getAmbientTemperature();
     buzzer.init();
-    delay(1000);
+    delay(2000);
     writeOutput.fanControl(false); // Turn off fan on boot
 }
 
@@ -79,7 +79,9 @@ void Cycle::mainCycle()
             batteryCheck(module);
             break;
         case 1: // Battery Barcode
+            #if defined(ONLINE)
             batteryBarcode(module);
+            #endif
             break;
         case 2: // Charge Battery
             cycleTimer.updateTimer(module);
@@ -87,11 +89,13 @@ void Cycle::mainCycle()
             {
                 faultCode[module] = 7;
                 processFault(module); // Set the Battery Fault Code to 7 High Temperature
+                break;
             }
             if (cycleTimer.getHours(module) == chargingTimeout)
             {
                 faultCode[module] = 9;
                 processFault(module); // Charging has reached Timeout period. Either battery will not hold charge, has high capacity or the TP5100 is faulty
+                break;
             }
             batteryCharge(module, true); // True for Charge cycle False for Recharge cycle
             fanOn = true;
@@ -109,6 +113,7 @@ void Cycle::mainCycle()
             {
                 faultCode[module] = 7;
                 processFault(module); // Set the Battery Fault Code to 7 High Temperature
+                break;
             }
             dischargeCycle(module);
             fanOn = true;
@@ -119,11 +124,13 @@ void Cycle::mainCycle()
             {
                 faultCode[module] = 7;
                 processFault(module); // Set the Battery Fault Code to 7 High Temperature
+                break;
             }
             if (cycleTimer.getHours(module) == chargingTimeout)
             {
                 faultCode[module] = 9;
                 processFault(module); // Charging has reached Timeout period. Either battery will not hold charge, has high capacity or the TP5100 is faulty
+                break;
             }
             batteryCharge(module, false); // True for Charge cycle False for Recharge cycle
             fanOn = true;
@@ -161,8 +168,9 @@ void Cycle::nextCycle(byte module)
 #endif
 
     case 2: // Charge Battery
-        writeOutput.chargeMosfetOff(module);
+        writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
         cycleState[module] = 3; // Successfully completed. Got to next cycle
+        batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         break;
 
     case 3:                                                              // Check Battery Milli Ohms
@@ -170,6 +178,7 @@ void Cycle::nextCycle(byte module)
         {
             faultCode[module] = 3; // Set the Battery Fault Code to 3 High Milli Ohms
             processFault(module);
+            break;
         }
         else
         {
@@ -177,12 +186,14 @@ void Cycle::nextCycle(byte module)
             batteryShuntVoltage = 0.00;
             dischargeAmps = 0.00;
             cycleState[module] = 4; // Successfully completed. Got to next cycle
+            batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         }
         break;
 
     case 4: // Rest Battery
         temperature.setInitialTemp(module);
         cycleState[module] = 5; // Successfully completed. Got to next cycle
+        batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         break;
 
     case 5: // Discharge Battery
@@ -191,18 +202,22 @@ void Cycle::nextCycle(byte module)
         {
             faultCode[module] = 5; // Set the Battery Fault Code to 5 Low Milliamps
             processFault(module);
+            break;
         }
         else
         {
             temperature.setInitialTemp(module);
             cycleState[module] = 6; // Successfully completed. Got to next cycle
+            batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         }
         break;
 
     case 6: // Recharge Battery
-        writeOutput.chargeMosfetOff(module);
+        writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
         faultCode[module] = 0;  // Set the Battery Fault Code to 0 No Faults
         cycleState[module] = 7; // Successfully completed. Got to next cycle
+        batteryInitialVoltage[module] = readInput.batteryVoltage(module);
+        buzzer.buzzerFinished();
         break;
     case 7: // Completed
         // Re-Initialize Variables - Batter removed - Restart the Cycle
@@ -228,27 +243,11 @@ void Cycle::nextCycle(byte module)
 
 void Cycle::processFault(byte module)
 {
-    switch (cycleState[module])
-    {
-    case 2: // Charge Battery
-        writeOutput.chargeMosfetOff(module);
-        break;
-
-    case 3: // Check Battery Milli Ohms
-
-        break;
-
-    case 5:                                     // Discharge Battery
-        writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
-        break;
-
-    case 6: // Recharge Battery
-        writeOutput.chargeMosfetOff(module);
-
-        break;
-    }
+    writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
+    writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
     cycleTimer.clearTimer(module);
     cycleState[module] = 7;
+    buzzer.buzzerFinished();
 }
 
 void Cycle::batteryCheck(byte module)
@@ -291,7 +290,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
     {
         if (cycleCount[module] < 8) // Possible false positive charge LED PIN results mitigation x8 cycles
         {
-            writeOutput.chargeMosfetOff(module);
+            writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
             cycleCount[module]++;
         }
         else
@@ -305,7 +304,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
             {
                 serialWIFI.insertDataFlag(module);
             }
-#elif
+#else
             nextCycle(module);
 #endif
         }

@@ -20,12 +20,12 @@ void SerialWIFI::init()
 {
 #if defined(ASCD_MEGA_8X) || SERIAL_PINS_JUMPPER == SS // If Nano uses Hardware Serial it can't print out on the same serial to console
 	//Initialize USB Serial
-	Serial.begin(9600);
+	Serial.begin(57600);
 	Serial.setTimeout(5);
 #endif
 
 	//Initialize Software Serial for communication with the ESP8266
-	ESP8266.begin(9600);
+	ESP8266.begin(57600);
 	ESP8266.setTimeout(5);
 }
 
