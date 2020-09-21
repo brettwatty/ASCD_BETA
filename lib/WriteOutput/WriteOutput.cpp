@@ -17,9 +17,6 @@ void WriteOutput::init()
         pinMode(dischargeMosfetPins[i], OUTPUT);
         dischargeMosfetOff(i);
         chargeMosfetOff(i);
-        delay(500);
-        chargeMosfetOn(i);
-        delay(500);
     }
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------

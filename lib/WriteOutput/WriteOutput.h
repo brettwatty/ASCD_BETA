@@ -39,7 +39,9 @@ public:
     void chargeMosfetOff(byte module);
     void dischargeMosfetOn(byte module);
     void dischargeMosfetOff(byte module);
+#if defined(ASCD_NANO_4X)
     void fanControl(boolean onOff);
+#endif
 };
 
 #endif

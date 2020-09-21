@@ -28,6 +28,7 @@ public:
     byte getInitialTemp(byte module);
     byte getHighestTemp(byte module);
     void setInitialTemp(byte module);
+    void clearHighestTemp(byte module);
 };
 
 #endif

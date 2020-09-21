@@ -7,10 +7,10 @@ class OutputLCD
 {
 private:
 #if defined(ASCD_MEGA_8X)
-    char lcdLine0[20];
-    char lcdLine1[20];
-    char lcdLine2[20];
-    char lcdLine3[20];
+    char lcdLine0[21];
+    char lcdLine1[21];
+    char lcdLine2[21];
+    char lcdLine3[21];
 #elif defined(ASCD_NANO_4X)
     char lcdLine0[16];
     char lcdLine1[16];

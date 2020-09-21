@@ -9,9 +9,7 @@
 #include <Buzzer.h>
 #include <Temperature.h>
 #include <InputDevices.h>
-#if defined(ONLINE)
 #include <SerialWIFI.h>
-#endif
 
 class Cycle
 {
@@ -33,12 +31,15 @@ private:
 
     byte faultCode[modulesCount];
 
+#if defined(ASCD_NANO_4X)
     // Fan Variables
     boolean fanOn = false;
-
+#endif
+#if defined(ONLINE)
     // Serial Variables
     boolean readSerialResponse = false;
     byte countSerialSend = 0;
+#endif
 
     // Private Class Functions
     ReadInput readInput;
@@ -48,9 +49,7 @@ private:
     Buzzer buzzer;
     Temperature temperature;
     InputDevices inputDevices;
-#if defined(ONLINE)
     SerialWIFI serialWIFI;
-#endif
 
     void mainCycle();
     void nextCycle(byte module);

@@ -12,12 +12,12 @@ void Cycle::init()
     writeOutput.init();
     inputDevices.init();
     temperature.init();
-#if defined(ONLINE)
     serialWIFI.init();
-#endif
 
-    // Initialize Output Pins / Analog Pins
+// Initialize Output Pins / Analog Pins
+#if defined(ASCD_NANO_4X)
     writeOutput.fanControl(true); // Turn on fan at boot
+#endif
     for (byte module = 0; module < modulesCount; module++)
     {
         writeOutput.chargeMosfetOn(module);
@@ -31,9 +31,11 @@ void Cycle::init()
         temperature.getTemperature(module, true);
     }
     temperature.getAmbientTemperature();
-    buzzer.init();
     delay(2000);
+#if defined(ASCD_NANO_4X)
+    buzzer.init();
     writeOutput.fanControl(false); // Turn off fan on boot
+#endif
 }
 
 void Cycle::cycleRun()
@@ -66,7 +68,9 @@ void Cycle::cycleRun()
 
 void Cycle::mainCycle()
 {
+#if defined(ASCD_NANO_4X)
     fanOn = false;
+#endif
 #if defined(ONLINE)
     serialWIFI.clearSerialSendString();
     serialWIFI.ambientTemperatureSerial(temperature.getAmbientTemperature());
@@ -79,9 +83,9 @@ void Cycle::mainCycle()
             batteryCheck(module);
             break;
         case 1: // Battery Barcode
-            #if defined(ONLINE)
+#if defined(ONLINE)
             batteryBarcode(module);
-            #endif
+#endif
             break;
         case 2: // Charge Battery
             cycleTimer.updateTimer(module);
@@ -98,7 +102,9 @@ void Cycle::mainCycle()
                 break;
             }
             batteryCharge(module, true); // True for Charge cycle False for Recharge cycle
+#if defined(ASCD_NANO_4X)
             fanOn = true;
+#endif
             break;
         case 3: // Check Battery Milli Ohms
             milliOhmsCycle(module);
@@ -116,7 +122,9 @@ void Cycle::mainCycle()
                 break;
             }
             dischargeCycle(module);
+#if defined(ASCD_NANO_4X)
             fanOn = true;
+#endif
             break;
         case 6: // Recharge Battery
             cycleTimer.updateTimer(module);
@@ -133,14 +141,18 @@ void Cycle::mainCycle()
                 break;
             }
             batteryCharge(module, false); // True for Charge cycle False for Recharge cycle
+#if defined(ASCD_NANO_4X)
             fanOn = true;
+#endif
             break;
         case 7: // Completed
             completeCycle(module);
             break;
         }
     }
+#if defined(ASCD_NANO_4X)
     writeOutput.fanControl((fanOn) ? true : false); // Checks if any module is charging or discharging and turn on fan or turn off
+#endif
 }
 
 void Cycle::nextCycle(byte module)
@@ -167,9 +179,9 @@ void Cycle::nextCycle(byte module)
         break;
 #endif
 
-    case 2: // Charge Battery
+    case 2:                                  // Charge Battery
         writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
-        cycleState[module] = 3; // Successfully completed. Got to next cycle
+        cycleState[module] = 3;              // Successfully completed. Got to next cycle
         batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         break;
 
@@ -207,15 +219,22 @@ void Cycle::nextCycle(byte module)
         else
         {
             temperature.setInitialTemp(module);
-            cycleState[module] = 6; // Successfully completed. Got to next cycle
+            if (rechargeCycle)
+            {
+                cycleState[module] = 6; // Successfully completed. Got to next cycle
+            }
+            else
+            {
+                cycleState[module] = 7; // Successfully completed. Recharge flag is false
+            }
             batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         }
         break;
 
-    case 6: // Recharge Battery
+    case 6:                                  // Recharge Battery
         writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
-        faultCode[module] = 0;  // Set the Battery Fault Code to 0 No Faults
-        cycleState[module] = 7; // Successfully completed. Got to next cycle
+        faultCode[module] = 0;               // Set the Battery Fault Code to 0 No Faults
+        cycleState[module] = 7;              // Successfully completed. Got to next cycle
         batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         buzzer.buzzerFinished();
         break;
@@ -229,6 +248,7 @@ void Cycle::nextCycle(byte module)
         dischargeCompleted[module] = false;
         batteryInitialVoltage[module] = 0.00;
         cycleState[module] = 0; // Restart cycle back to detect battery
+        temperature.clearHighestTemp(module);
 #if defined(ONLINE)
         serialWIFI.resetBarcodeScanned(module);
 #endif
@@ -243,7 +263,7 @@ void Cycle::nextCycle(byte module)
 
 void Cycle::processFault(byte module)
 {
-    writeOutput.chargeMosfetOff(module); // Turn off the Charge Mosfet
+    writeOutput.chargeMosfetOff(module);    // Turn off the Charge Mosfet
     writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
     cycleTimer.clearTimer(module);
     cycleState[module] = 7;
@@ -286,7 +306,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
 {
     writeOutput.chargeMosfetOn(module);
     batteryVoltage = readInput.batteryVoltage(module);
-    if (readInput.chargeLed(module))
+    if (readInput.chargeLed(module) || (storageChargeVoltage > 0.00 && batteryVoltage > (storageChargeVoltage * 1.09)))
     {
         if (cycleCount[module] < 8) // Possible false positive charge LED PIN results mitigation x8 cycles
         {
