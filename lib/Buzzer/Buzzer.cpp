@@ -5,7 +5,7 @@ Buzzer::Buzzer()
 
 void Buzzer::init()
 {
-    buzzerStart();
+    // buzzerStart();
 }
 
 void Buzzer::buzzerStart()

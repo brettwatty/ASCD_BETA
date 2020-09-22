@@ -306,7 +306,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
 {
     writeOutput.chargeMosfetOn(module);
     batteryVoltage = readInput.batteryVoltage(module);
-    if (readInput.chargeLed(module) || (storageChargeVoltage > 0.00 && batteryVoltage > (storageChargeVoltage * 1.09)))
+    if (readInput.chargeLed(module) || (chargeRecharge == false && storageChargeVoltage > 0.00 && batteryVoltage > (storageChargeVoltage * 1.09)))
     {
         if (cycleCount[module] < 8) // Possible false positive charge LED PIN results mitigation x8 cycles
         {
