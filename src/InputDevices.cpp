@@ -1,5 +1,7 @@
+#include "Config.h"
+
 #include <InputDevices.h>
-#include <Variables.h>
+
 #if defined(ASCD_MEGA_8X)
 
 #elif defined(ASCD_NANO_4X)

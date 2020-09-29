@@ -1,7 +1,12 @@
-#include <Variables.h>
+#include "Config.h"
+
 #include <ReadInput.h>
+
 ReadInput::ReadInput()
 {
+#if defined(ASCD_NANO_4X)
+
+#endif
 }
 
 void ReadInput::init()
@@ -16,6 +21,7 @@ void ReadInput::init()
         pinMode(batteryVoltageDropPin[i], INPUT); // Analog reading discharge resistor Battery positive terminal
         pinMode(chargeLedPin[i], INPUT_PULLUP);   // Charge LED Digital reading from TP4056
     }
+    // #error "ASCD_MEGA_8X"
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
@@ -29,15 +35,19 @@ void ReadInput::init()
     digitalWrite(S2, LOW);
     digitalWrite(S3, LOW);
     pinMode(SIG, INPUT); // Analog Mux SIG pin A0
+    // #error "ASCD_NANO_4X"
 #endif
 }
 
-float ReadInput::batteryVoltage(byte module)
+int ReadInput::batteryVoltage(byte module)
 {
+    // Serial.print(F("Module: "));
+    // Serial.println(module);
+    // Serial.println(getInput(batteryVoltagePin[module]));
     return getInput(batteryVoltagePin[module]);
 }
 
-float ReadInput::batteryVoltageDrop(byte module)
+int ReadInput::batteryVoltageDrop(byte module)
 {
     return getInput(batteryVoltageDropPin[module]);
 }
@@ -51,22 +61,22 @@ bool ReadInput::chargeLed(byte module)
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
-    return (getInput(chargeLedPin[module]) >= chargeLedPinMidVoltage[module]) ? true : false;
+    return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
 #endif
 }
 
 #if defined(ASCD_MEGA_8X)
-float ReadInput::getInput(const byte arrayPin)
+int ReadInput::getInput(const byte arrayPin)
 {
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
     // Read the value at the SIG pin 10x and convert to voltage
-    float batterySampleVoltage = 0.00;
+    int batterySampleVoltage = 0;
     for (byte i = 0; i < 10; i++)
     {
-        if (useReferenceVoltage)
+        if (config.useReferenceVoltage)
         {
-            batterySampleVoltage = batterySampleVoltage + (analogRead(arrayPin) * (referenceVoltage) / 1023.0);
+            batterySampleVoltage = batterySampleVoltage + (analogRead(arrayPin) * (long)config.referenceVoltage / 1023.0);
         }
         else
         {
@@ -76,9 +86,9 @@ float ReadInput::getInput(const byte arrayPin)
 #elif defined(ASCD_NANO_4X)
 // --------------------------------------------------------------------------------------------------
 // ASCD Nano 4x
-float ReadInput::getInput(const bool arrayPins[])
+int ReadInput::getInput(const bool arrayPins[])
 {
-    float batterySampleVoltage = 0.00;
+    unsigned int batterySampleVoltage = 0;
     const byte controlPin[] = {S0, S1, S2, S3};
 
     // Loop through the 4 sig
@@ -90,13 +100,13 @@ float ReadInput::getInput(const bool arrayPins[])
 
     for (byte i = 0; i < 10; i++)
     {
-        if (useReferenceVoltage)
+        if (config.useReferenceVoltage)
         {
-            batterySampleVoltage = batterySampleVoltage + (analogRead(SIG) * (referenceVoltage) / 1023.0);
+            batterySampleVoltage = batterySampleVoltage + (analogRead(SIG) * (long)config.referenceVoltage / 1023);
         }
         else
         {
-            batterySampleVoltage = batterySampleVoltage + (analogRead(SIG) * (readVcc()));
+            batterySampleVoltage = batterySampleVoltage + (analogRead(SIG) * readVcc() * 1000);
         }
     }
 #endif
@@ -125,5 +135,5 @@ float ReadInput::readVcc()
         ;
     result = ADCL;
     result |= ADCH << 8;
-    return ((internalReferenceVoltage * 1024) / result) / 1023.0; // Calculate Vcc (in Volts) = (((Internal Voltage reference 1.1) * 1024) / result) / 1023
+    return (((config.internalReferenceVoltage / 1000.0) * 1024) / result) / 1023.0; // Calculate Vcc (in Volts) = (((Internal Voltage reference 1.1) * 1024) / result) / 1023
 }

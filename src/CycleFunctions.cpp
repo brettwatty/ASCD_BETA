@@ -1,11 +1,15 @@
+#include "Config.h"
+
 #include <CycleFunctions.h>
-#include <Variables.h>
+
 Cycle::Cycle()
 {
 }
 
 void Cycle::init()
 {
+    // Initialize Classes.
+    
     outputLCD.init();
     outputLCD.startup();
     readInput.init();
@@ -13,11 +17,12 @@ void Cycle::init()
     inputDevices.init();
     temperature.init();
     serialWIFI.init();
+    variablesEEPROM.init();
 
-// Initialize Output Pins / Analog Pins
 #if defined(ASCD_NANO_4X)
     writeOutput.fanControl(true); // Turn on fan at boot
 #endif
+    // Initialize Output Pins / Analog Pins
     for (byte module = 0; module < modulesCount; module++)
     {
         writeOutput.chargeMosfetOn(module);
@@ -30,6 +35,7 @@ void Cycle::init()
         readInput.batteryVoltageDrop(module);
         temperature.getTemperature(module, true);
     }
+
     temperature.getAmbientTemperature();
     delay(2000);
 #if defined(ASCD_NANO_4X)
@@ -95,7 +101,7 @@ void Cycle::mainCycle()
                 processFault(module); // Set the Battery Fault Code to 7 High Temperature
                 break;
             }
-            if (cycleTimer.getHours(module) == chargingTimeout)
+            if (cycleTimer.getHours(module) == config.chargingTimeout)
             {
                 faultCode[module] = 9;
                 processFault(module); // Charging has reached Timeout period. Either battery will not hold charge, has high capacity or the TP5100 is faulty
@@ -134,7 +140,7 @@ void Cycle::mainCycle()
                 processFault(module); // Set the Battery Fault Code to 7 High Temperature
                 break;
             }
-            if (cycleTimer.getHours(module) == chargingTimeout)
+            if (cycleTimer.getHours(module) == config.chargingTimeout)
             {
                 faultCode[module] = 9;
                 processFault(module); // Charging has reached Timeout period. Either battery will not hold charge, has high capacity or the TP5100 is faulty
@@ -163,7 +169,6 @@ void Cycle::nextCycle(byte module)
     case 0: // Check Battery Voltage
 #if defined(ONLINE)
         cycleState[module] = 1;
-        // cycleState[module] = 2; // Testing
 #elif defined(OFFLINE)
         temperature.setInitialTemp(module);
         cycleState[module] = 2; // Successfully completed. Got to next cycle
@@ -185,8 +190,8 @@ void Cycle::nextCycle(byte module)
         batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         break;
 
-    case 3:                                                              // Check Battery Milli Ohms
-        if (milliOhms[module] > highMilliOhms || milliOhms[module] <= 0) // Check if Milli Ohms is greater than the set high Milli Ohms value -  && cycleCount[module] >= 7
+    case 3:                                                                     // Check Battery Milli Ohms
+        if (milliOhms[module] > config.highMilliOhms || milliOhms[module] <= 0) // Check if Milli Ohms is greater than the set high Milli Ohms value -  && cycleCount[module] >= 7
         {
             faultCode[module] = 3; // Set the Battery Fault Code to 3 High Milli Ohms
             processFault(module);
@@ -194,9 +199,9 @@ void Cycle::nextCycle(byte module)
         }
         else
         {
-            batteryVoltage = 0.00;
-            batteryShuntVoltage = 0.00;
-            dischargeAmps = 0.00;
+            batteryVoltage = 0;
+            batteryShuntVoltage = 0;
+            dischargeAmps = 0;
             cycleState[module] = 4; // Successfully completed. Got to next cycle
             batteryInitialVoltage[module] = readInput.batteryVoltage(module);
         }
@@ -210,7 +215,7 @@ void Cycle::nextCycle(byte module)
 
     case 5: // Discharge Battery
         dischargeCompleted[module] = false;
-        if (dischargeMilliamps[module] < lowMilliAmps) // No need to recharge the battery if it has low Milliamps
+        if (dischargeMilliamps[module] < config.lowMilliAmps) // No need to recharge the battery if it has low Milliamps
         {
             faultCode[module] = 5; // Set the Battery Fault Code to 5 Low Milliamps
             processFault(module);
@@ -219,7 +224,7 @@ void Cycle::nextCycle(byte module)
         else
         {
             temperature.setInitialTemp(module);
-            if (rechargeCycle)
+            if (config.rechargeCycle)
             {
                 cycleState[module] = 6; // Successfully completed. Got to next cycle
             }
@@ -240,13 +245,13 @@ void Cycle::nextCycle(byte module)
         break;
     case 7: // Completed
         // Re-Initialize Variables - Batter removed - Restart the Cycle
-        batteryVoltage = 0.00;
-        batteryShuntVoltage = 0.00;
-        dischargeAmps = 0.00;
+        batteryVoltage = 0;
+        batteryShuntVoltage = 0;
+        dischargeAmps = 0;
         dischargeMilliamps[module] = 0.00;
         milliOhms[module] = 0;
         dischargeCompleted[module] = false;
-        batteryInitialVoltage[module] = 0.00;
+        batteryInitialVoltage[module] = 0;
         cycleState[module] = 0; // Restart cycle back to detect battery
         temperature.clearHighestTemp(module);
 #if defined(ONLINE)
@@ -280,7 +285,7 @@ void Cycle::batteryCheck(byte module)
 #if defined(ONLINE)
     serialWIFI.batteryCheckSerial(module);
 #endif
-    if (batteryVoltage >= batteryVoltageLeak)
+    if (batteryVoltage >= config.batteryVoltageLeak)
     {
         nextCycle(module);
     }
@@ -306,7 +311,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
 {
     writeOutput.chargeMosfetOn(module);
     batteryVoltage = readInput.batteryVoltage(module);
-    if (readInput.chargeLed(module) || (chargeRecharge == false && storageChargeVoltage > 0.00 && batteryVoltage > (storageChargeVoltage * 1.09)))
+    if (readInput.chargeLed(module) || (chargeRecharge == false && config.storageChargeVoltage > 0 && batteryVoltage > (config.storageChargeVoltage * 1.09)))
     {
         if (cycleCount[module] < 8) // Possible false positive charge LED PIN results mitigation x8 cycles
         {
@@ -340,19 +345,18 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
 
 void Cycle::milliOhmsCycle(byte module)
 {
-    int tempMilliOhms = 0.00;
+    int tempMilliOhms = 0;
     if (cycleCount[module] < 8)
     {
-        batteryVoltage = 0.00;
-        batteryShuntVoltage = 0.00;
+        batteryVoltage = 0;
+        batteryShuntVoltage = 0;
 
         batteryVoltage = readInput.batteryVoltage(module);      // Get Battery Voltage with no load
         writeOutput.dischargeMosfetOn(module);                  // Turn on the Discharge Mosfet
         batteryShuntVoltage = readInput.batteryVoltage(module); // Get Battery Voltage with load
         writeOutput.dischargeMosfetOff(module);                 // Turn off the Discharge Mosfet
-
-        tempMilliOhms = (((batteryVoltage - batteryShuntVoltage) / (batteryShuntVoltage / shuntResistor[module])) * 1000) + offsetMilliOhms; // The Drain-Source On-State Resistance of the Discharge Mosfet
-        if (tempMilliOhms > 1000)                                                                                                            // Max 3 digits on LCD
+        tempMilliOhms = (((batteryVoltage - batteryShuntVoltage) / (batteryShuntVoltage / config.shuntResistor[module]))) + config.offsetMilliOhms; // The Drain-Source On-State Resistance of the Discharge Mosfet
+        if (tempMilliOhms > 1000)                                                                                                                   // Max 3 digits on LCD
             tempMilliOhms = 999;
         if (cycleTimer.getLCDActiveModule() == module)
         {
@@ -381,7 +385,7 @@ void Cycle::restCycle(byte module)
 #if defined(ONLINE)
     serialWIFI.batteryRestSerial(module, milliOhms[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), batteryVoltage);
 #endif
-    if (cycleTimer.getMinutes(module) == restTimeMinutes) // Rest time
+    if (cycleTimer.getMinutes(module) == config.restTimeMinutes) // Rest time
     {
         nextCycle(module);
     }
@@ -389,17 +393,16 @@ void Cycle::restCycle(byte module)
 
 void Cycle::dischargeCycle(byte module)
 {
-    batteryVoltage = 0.00;
-    batteryShuntVoltage = 0.00;
-    dischargeAmps = 0.00;
-    batteryShuntVoltage = 0.00;
+    batteryVoltage = 0;
+    batteryShuntVoltage = 0;
+    dischargeAmps = 0;
     batteryVoltage = readInput.batteryVoltage(module);
-    if (batteryVoltage >= defaultBatteryCutOffVoltage && dischargeCompleted[module] == false)
+    if (batteryVoltage >= config.defaultBatteryCutOffVoltage && dischargeCompleted[module] == false)
     {
         writeOutput.dischargeMosfetOn(module); // Turn on the Discharge Mosfet
         batteryVoltage = readInput.batteryVoltage(module);
         batteryShuntVoltage = readInput.batteryVoltageDrop(module);
-        dischargeAmps = (batteryVoltage - batteryShuntVoltage) / shuntResistor[module];
+        dischargeAmps = (((batteryVoltage - batteryShuntVoltage) / (config.shuntResistor[module] / 1000.0)));
         if (dischargeMilliSecondsPrevious[module] == 0) // First run needs time to calculate time passed
         {
             dischargeMillisTime = 1000; // Discharge cycle trigger is average of 1000 milliseconds
@@ -408,7 +411,7 @@ void Cycle::dischargeCycle(byte module)
         {
             dischargeMillisTime = millis() - dischargeMilliSecondsPrevious[module]; // Calculate time passed since last discharge cycle trigger
         }
-        dischargeMilliamps[module] = dischargeMilliamps[module] + ((dischargeAmps * dischargeMillisTime) / 3600);
+        dischargeMilliamps[module] = dischargeMilliamps[module] + ((((dischargeAmps / 1000.0) * dischargeMillisTime) / 3600));
         dischargeMilliSecondsPrevious[module] = millis();
         if (cycleTimer.getLCDActiveModule() == module)
         {
@@ -448,7 +451,7 @@ void Cycle::completeCycle(byte module)
 #if defined(ONLINE)
     serialWIFI.completeSerial(module, faultCode[module], batteryVoltage);
 #endif
-    if (batteryVoltage < batteryVoltageLeak)
+    if (batteryVoltage < config.batteryVoltageLeak)
     {
         nextCycle(module);
     }

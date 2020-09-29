@@ -1,4 +1,5 @@
-#include <Variables.h>
+#include "Config.h"
+
 #include <WriteOutput.h>
 
 WriteOutput::WriteOutput()

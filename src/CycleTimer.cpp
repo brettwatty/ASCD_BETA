@@ -1,4 +1,7 @@
+#include "Config.h"
+
 #include <CycleTimer.h>
+
 CycleTimer::CycleTimer()
 {
 }
@@ -63,12 +66,12 @@ void CycleTimer::setLCDActiveModule()
 void CycleTimer::LCDCycle()
 {
 
-    if ((millis() - LCDCycleMillis) >= (screenTime * 1000))
+    if ((millis() - LCDCycleMillis) >= (config.screenTime * 1000))
     {
         LCDCycleMillis = millis();
         if (lockActiveLCD)
         {
-            if ((60 / screenTime) >= lockActiveLCDCount)
+            if ((60 / config.screenTime) >= lockActiveLCDCount)
             {
                 lockActiveLCDCount++;
             }

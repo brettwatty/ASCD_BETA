@@ -1,8 +1,9 @@
+#include "Config.h"
+
 #include <Temperature.h>
 #include <Wire.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
-#include <Variables.h>
 
 #define TEMPERATURE_PRECISION 9
 
@@ -20,11 +21,11 @@ OneWire oneWire(ONE_WIRE_BUS);       // Setup a oneWire instance to communicate 
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
 
 DeviceAddress tempSensorSerial[modulesCount + 1] =
-    {{0x28, 0xD5, 0x73, 0x79, 0xA2, 0x00, 0x03, 0x72},
-     {0x28, 0x46, 0xF9, 0x79, 0xA2, 0x01, 0x03, 0x28},
-     {0x28, 0xB2, 0x23, 0x79, 0xA2, 0x01, 0x03, 0x65},
-     {0x28, 0x5F, 0xED, 0x79, 0xA2, 0x01, 0x03, 0x86},
-     {0x28, 0xAB, 0xF7, 0x79, 0xA2, 0x00, 0x03, 0x2D}};
+    {{0x28, 0x3C, 0x47, 0x79, 0x97, 0x05, 0x03, 0x42},
+     {0x28, 0x87, 0xA1, 0x79, 0xA2, 0x00, 0x03, 0xEF},
+     {0x28, 0xE9, 0x87, 0x79, 0xA2, 0x00, 0x03, 0x5B},
+     {0x28, 0xB4, 0x4B, 0x79, 0xA2, 0x00, 0x03, 0x3C},
+     {0x28, 0x06, 0x18, 0x79, 0xA2, 0x01, 0x03, 0x4A}};
 
 Temperature::Temperature()
 {
@@ -40,9 +41,9 @@ byte Temperature::processTemperature(byte module)
     getTemperature(module, false);
     if (batteryCurrentTemp[module] > batteryHighestTemp[module] && batteryCurrentTemp[module] != 99)
         batteryHighestTemp[module] = batteryCurrentTemp[module]; // Set highest temperature if current value is higher
-    if ((batteryCurrentTemp[module] - batteryCurrentTemp[modulesCount]) > tempThreshold && batteryCurrentTemp[module] != 99 && batteryCurrentTemp[module] != 0)
+    if ((batteryCurrentTemp[module] - batteryCurrentTemp[modulesCount]) > config.tempThreshold && batteryCurrentTemp[module] != 99 && batteryCurrentTemp[module] != 0)
     {
-        if ((batteryCurrentTemp[module] - batteryCurrentTemp[modulesCount]) > tempMaxThreshold) // batteryCurrentTemp[modulesCount] is the ambient temp sensor
+        if ((batteryCurrentTemp[module] - batteryCurrentTemp[modulesCount]) > config.tempMaxThreshold) // batteryCurrentTemp[modulesCount] is the ambient temp sensor
         {
             //Temp higher than Maximum Threshold
             return 2;
