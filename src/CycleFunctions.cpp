@@ -17,7 +17,7 @@ void Cycle::init()
     inputDevices.init();
     temperature.init();
     serialWIFI.init();
-    variablesEEPROM.init();
+    configEEPROM.init();
 
 #if defined(ASCD_NANO_4X)
     writeOutput.fanControl(true); // Turn on fan at boot

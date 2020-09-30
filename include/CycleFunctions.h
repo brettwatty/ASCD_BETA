@@ -12,7 +12,7 @@
 #include <Temperature.h>
 #include <InputDevices.h>
 #include <SerialWIFI.h>
-#include <VariablesEEPROM.h>
+#include <ConfigEEPROM.h>
 
 
 class Cycle
@@ -54,7 +54,7 @@ private:
     Temperature temperature;
     InputDevices inputDevices;
     SerialWIFI serialWIFI;
-    VariablesEEPROM variablesEEPROM;
+    ConfigEEPROM configEEPROM;
 
     
 
@@ -75,5 +75,4 @@ public:
     void init();
     void cycleRun();
 };
-// // extern configuration config;
 #endif

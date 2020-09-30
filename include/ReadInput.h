@@ -54,5 +54,4 @@ public:
     int batteryVoltageDrop(byte module);
     bool chargeLed(byte module);
 };
-// extern configuration config;
 #endif

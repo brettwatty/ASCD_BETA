@@ -33,5 +33,4 @@ public:
     void setInitialTemp(byte module);
     void clearHighestTemp(byte module);
 };
-// extern configuration config;
 #endif

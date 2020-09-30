@@ -1,19 +1,19 @@
 #include "Config.h"
 
-#include <VariablesEEPROM.h>
+#include <ConfigEEPROM.h>
 #include <EEPROM.h>
 
-VariablesEEPROM::VariablesEEPROM()
+ConfigEEPROM::ConfigEEPROM()
 {
 }
 
-void VariablesEEPROM::init()
+void ConfigEEPROM::init()
 {
     // writeEEPROMTest();
     readEEPROMTest();
 }
 
-void VariablesEEPROM::writeEEPROMTest()
+void ConfigEEPROM::writeEEPROMTest()
 {
     // // useReferenceVoltage
     // EEPROM.put(addressEEPROM, variables.useReferenceVoltage);
@@ -72,7 +72,7 @@ void VariablesEEPROM::writeEEPROMTest()
     // // addressEEPROM += sizeof(bool);
 }
 
-void VariablesEEPROM::readEEPROMTest()
+void ConfigEEPROM::readEEPROMTest()
 {
     // // useReferenceVoltage
     // EEPROM.get(addressEEPROM, testOutput1);
@@ -159,6 +159,6 @@ void VariablesEEPROM::readEEPROMTest()
     // // addressEEPROM += sizeof(bool);
 }
 
-void VariablesEEPROM::clearEEPROMTest()
+void ConfigEEPROM::clearEEPROMTest()
 {
 }

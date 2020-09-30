@@ -47,5 +47,4 @@ public:
     byte getMinutes(byte module);
     byte getHours(byte module);
 };
-// extern configuration config;
 #endif
