@@ -117,7 +117,7 @@ void OutputLCD::batteryDischargeLCD(byte module, int batteryVoltage, int dischar
 {
 #if defined(ASCD_MEGA_8X)
     sprintf_P(lcdLine0, PSTR("%d%-7S %d.%02dA %d.%02dV"), module + 1, PSTR("-DCHG"), (int)(dischargeAmps / 1000.0), (int)((dischargeAmps / 1000.0) * 100) % 100, (int)(batteryVoltage / 1000.0), (int)((batteryVoltage / 1000.0) * 100) % 100);
-    sprintf_P(lcdLine1, PSTR("%02d:%02d:%02d %02d%c %04dmAh"), hours, minutes, seconds, batteryTemp, 223, dischargeMilliamps));
+    sprintf_P(lcdLine1, PSTR("%02d:%02d:%02d %02d%c %04dmAh"), hours, minutes, seconds, batteryTemp, 223, dischargeMilliamps);
 #elif defined(ASCD_NANO_4X)
     sprintf_P(lcdLine0, PSTR("%d%-4S%d.%02dA %d.%02dV"), module + 1, PSTR("-DC"), (int)(dischargeAmps / 1000.0), (int)((dischargeAmps / 1000.0) * 100) % 100, (int)(batteryVoltage / 1000.0), (int)((batteryVoltage / 1000.0) * 100) % 100);
     sprintf_P(lcdLine1, PSTR("%02d:%02d:%02d %04dmAh"), hours, minutes, seconds, dischargeMilliamps);
