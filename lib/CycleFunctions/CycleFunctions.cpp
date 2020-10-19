@@ -1,4 +1,4 @@
-#include "Config.h"
+// #include <Config.h>
 
 #include <CycleFunctions.h>
 
@@ -12,18 +12,18 @@ void Cycle::init()
     
     outputLCD.init();
     outputLCD.startup();
-    readInput.init();
     writeOutput.init();
     inputDevices.init();
     temperature.init();
     serialWIFI.init();
     configEEPROM.init();
+    readInput.init();
 
 #if defined(ASCD_NANO_4X)
     writeOutput.fanControl(true); // Turn on fan at boot
 #endif
     // Initialize Output Pins / Analog Pins
-    for (byte module = 0; module < modulesCount; module++)
+    for (byte module = 0; module < MODULES_COUNT; module++)
     {
         writeOutput.chargeMosfetOn(module);
         delay(500);
@@ -81,7 +81,7 @@ void Cycle::mainCycle()
     serialWIFI.clearSerialSendString();
     serialWIFI.ambientTemperatureSerial(temperature.getAmbientTemperature());
 #endif
-    for (int module = 0; module < modulesCount; module++)
+    for (int module = 0; module < MODULES_COUNT; module++)
     {
         switch (cycleState[module])
         {

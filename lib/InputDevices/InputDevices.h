@@ -1,7 +1,7 @@
 #ifndef INPUT_DEVICES_H
 #define INPUT_DEVICES_H
 
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 

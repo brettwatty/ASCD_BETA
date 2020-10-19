@@ -11,7 +11,7 @@ void ClientWIFI::init()
     delay(5000);
     Serial.begin(57600);
     Serial.setTimeout(5);
-    WiFi.begin(ssid, password);
+    WiFi.begin(config.ssid, config.password);
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
@@ -38,18 +38,18 @@ void ClientWIFI::cycleClientWifi()
 
 String ClientWIFI::updateUnitData()
 {
-    if (client.connect(server, 80))
+    if (client.connect(config.server, 80))
     {
         client.print("GET /update_unit_data_dev.php?");
         client.print("UH=");
-        client.print(userHash);
+        client.print(config.userHash);
         client.print("&");
         client.print("CD=");
-        client.print(CDUnitID);
+        client.print(config.CDUnitID);
         client.print(updateUnitDataString);
         client.println(" HTTP/1.1");
         client.print("Host: ");
-        client.println(server);
+        client.println(config.server);
         client.println("Connection: close");
         client.println();
         client.println();

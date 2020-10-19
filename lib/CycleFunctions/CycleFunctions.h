@@ -1,7 +1,7 @@
 #ifndef CYCLE_FUNCTIONS_H
 #define CYCLE_FUNCTIONS_H
 
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 #include <ReadInput.h>
@@ -18,34 +18,35 @@
 class Cycle
 {
 private:
-    byte cycleState[modulesCount]; // Current Cycle State of ASCD Module
-    byte cycleCount[modulesCount]; // Reusable Count Array for Cycles
+    byte cycleState[MODULES_COUNT]; // Current Cycle State of ASCD Module
+    byte cycleCount[MODULES_COUNT]; // Reusable Count Array for Cycles
 
     int batteryVoltage = 0;
     int batteryShuntVoltage = 0;
     int dischargeAmps = 0;
-    float dischargeMilliamps[modulesCount];
+    float dischargeMilliamps[MODULES_COUNT];
     int dischargeMillisTime = 0;
-    boolean dischargeCompleted[modulesCount];
-    unsigned long dischargeMilliSecondsPrevious[modulesCount];
+    bool dischargeCompleted[MODULES_COUNT];
+    unsigned long dischargeMilliSecondsPrevious[MODULES_COUNT];
 
-    int milliOhms[modulesCount];
+    int milliOhms[MODULES_COUNT];
 
-    float batteryInitialVoltage[modulesCount];
+    float batteryInitialVoltage[MODULES_COUNT];
 
-    byte faultCode[modulesCount];
+    byte faultCode[MODULES_COUNT];
 
 #if defined(ASCD_NANO_4X)
     // Fan Variables
-    boolean fanOn = false;
+    bool fanOn = false;
 #endif
 #if defined(ONLINE)
     // Serial Variables
-    boolean readSerialResponse = false;
+    bool readSerialResponse = false;
     byte countSerialSend = 0;
 #endif
 
     // Private Class Functions
+    Config config;
     ReadInput readInput;
     WriteOutput writeOutput;
     OutputLCD outputLCD;

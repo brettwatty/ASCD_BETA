@@ -14,6 +14,7 @@ private:
     String updateUnitDataString;
 
     // Private Class Functions
+    Config config;
     WiFiClient client;
 
 public:

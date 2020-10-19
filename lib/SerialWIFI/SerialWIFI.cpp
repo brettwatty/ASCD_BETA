@@ -1,4 +1,4 @@
-#include "Config.h"
+// #include <Config.h>
 
 #include <SerialWIFI.h>
 
@@ -208,7 +208,7 @@ void SerialWIFI::insertDataFlag(byte module)
 	sprintf_P(serialSendString + strlen(serialSendString), PSTR("&ID%d"), module);
 }
 
-boolean SerialWIFI::getBarcodeScanned(byte module)
+bool SerialWIFI::getBarcodeScanned(byte module)
 {
 	return barcodeScanned[module];
 }
@@ -218,7 +218,7 @@ void SerialWIFI::resetBarcodeScanned(byte module)
 	barcodeScanned[module] = false;
 }
 
-boolean SerialWIFI::getInsertDataFlag(byte module)
+bool SerialWIFI::getInsertDataFlag(byte module)
 {
 	return insertData[module];
 }

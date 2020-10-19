@@ -14,12 +14,13 @@ private:
     byte foundTempSensorsCount;
     float sensorTemp;
     float tempSensorAverageTemp;
-    bool tempSensorSerialCompleted[modulesCount + 1];
-    byte tempSensorSerialOutput[modulesCount + 1];
+    bool tempSensorSerialCompleted[MODULES_COUNT + 1];
+    byte tempSensorSerialOutput[MODULES_COUNT + 1];
     bool detectionComplete = false;
     byte pendingDetection = 0;
 
     // External Classes
+    Config config;
     WriteOutput writeOutput;
     ConfigEEPROM configEEPROM;
 

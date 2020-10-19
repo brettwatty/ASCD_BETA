@@ -1,8 +1,8 @@
 #ifndef READ_INPUT__H
 #define READ_INPUT__H
 
-#include "Config.h"
-
+#include <Config.h>
+#include <ConfigEEPROM.h>
 #include <Arduino.h>
 
 class ReadInput
@@ -13,11 +13,10 @@ private:
     // ASCD Mega 8x
 
     // Analog and Digital Pin Mapping
-    const byte batteryVoltagePin[modulesCount] = {A0, A2, A4, A6, A8, A10, A12, A14};
-    const byte batteryVoltageDropPin[modulesCount] = {A1, A3, A5, A7, A9, A11, A13, A15};
-    const byte chargeLedPin[modulesCount] = {23, 26, 29, 32, 35, 38, 41, 44};
+    const byte batteryVoltagePin[MODULES_COUNT] = {A0, A2, A4, A6, A8, A10, A12, A14};
+    const byte batteryVoltageDropPin[MODULES_COUNT] = {A1, A3, A5, A7, A9, A11, A13, A15};
+    const byte chargeLedPin[MODULES_COUNT] = {23, 26, 29, 32, 35, 38, 41, 44};
 
-    // Private Class Functions
     int getInput(const byte arrayPin);
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
@@ -31,9 +30,9 @@ private:
     const byte S3 = 9;
 
     // Mux Pin Mapping
-    const bool batteryVoltagePin[modulesCount][4] = {{1, 1, 0, 1}, {1, 0, 0, 1}, {1, 1, 1, 0}, {1, 0, 1, 0}};
-    const bool batteryVoltageDropPin[modulesCount][4] = {{1, 1, 1, 1}, {0, 1, 1, 1}, {1, 0, 1, 1}, {0, 0, 1, 1}};
-    const bool chargeLedPin[modulesCount][4] = {{0, 1, 0, 1}, {0, 0, 0, 1}, {0, 1, 1, 0}, {0, 0, 1, 0}};
+    const bool batteryVoltagePin[MODULES_COUNT][4] = {{1, 1, 0, 1}, {1, 0, 0, 1}, {1, 1, 1, 0}, {1, 0, 1, 0}};
+    const bool batteryVoltageDropPin[MODULES_COUNT][4] = {{1, 1, 1, 1}, {0, 1, 1, 1}, {1, 0, 1, 1}, {0, 0, 1, 1}};
+    const bool chargeLedPin[MODULES_COUNT][4] = {{0, 1, 0, 1}, {0, 0, 0, 1}, {0, 1, 1, 0}, {0, 0, 1, 0}};
 
     // Mux SIG pin Analog A0
     const byte SIG = 14;
@@ -45,6 +44,8 @@ private:
 
     // Private Class Functions
     float readVcc();
+    ConfigEEPROM configEEPROM;
+    Config config;
 
 public:
     // Public Class Functions
@@ -52,6 +53,7 @@ public:
     void init();
     int batteryVoltage(byte module);
     int batteryVoltageDrop(byte module);
+    int chargeLedVoltage(byte module);
     bool chargeLed(byte module);
 };
 #endif

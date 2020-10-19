@@ -1,24 +1,28 @@
 #ifndef VARIABLES_EEPROM_H
 #define VARIABLES_EEPROM_H
 
-// #include "Config.h"
-
+#include <Config.h>
 #include <Arduino.h>
 
 class ConfigEEPROM
 {
 private:
+    bool emptyEEPROM;
     byte addressEEPROM = 0;
- 
-    // Variables variables;
+    byte addressCountEEPROM = 0;
+
+    // Private Class Functions
+    Config config;
+
 public:
     // Public Class Functions
     ConfigEEPROM();
     void init();
     void writeConfigEEPROM();
-    void readConfigEEPROM();
+    void loadConfigEEPROM();
     void clearEEPROM();
-    bool checkEEPROMEmpty();
+    void checkEEPROMEmpty();
+    bool getEEPROMEmpty();
+    void setAddressSize();
 };
-
 #endif

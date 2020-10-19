@@ -1,5 +1,4 @@
-#include "Config.h"
-
+// #include <Config.h>
 #include <ReadInput.h>
 
 ReadInput::ReadInput()
@@ -15,7 +14,7 @@ void ReadInput::init()
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
     // Pin Initialization
-    for (byte i = 0; i < modulesCount; i++)
+    for (byte i = 0; i < MODULES_COUNT; i++)
     {
         pinMode(batteryVoltagePin[i], INPUT);     // Analog reading of the Battery positive terminal
         pinMode(batteryVoltageDropPin[i], INPUT); // Analog reading discharge resistor Battery positive terminal
@@ -41,15 +40,17 @@ void ReadInput::init()
 
 int ReadInput::batteryVoltage(byte module)
 {
-    // Serial.print(F("Module: "));
-    // Serial.println(module);
-    // Serial.println(getInput(batteryVoltagePin[module]));
     return getInput(batteryVoltagePin[module]);
 }
 
 int ReadInput::batteryVoltageDrop(byte module)
 {
     return getInput(batteryVoltageDropPin[module]);
+}
+
+int ReadInput::chargeLedVoltage(byte module)
+{
+    return getInput(chargeLedPin[module]);
 }
 
 bool ReadInput::chargeLed(byte module)
@@ -61,7 +62,14 @@ bool ReadInput::chargeLed(byte module)
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
-    return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
+    // if (configEEPROM.checkEEPROMEmpty() == true)
+    // {
+        return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
+    // }
+    // else
+    // {
+    //     return (getInput(chargeLedPin[module]) >= configEEPROM.chargeLedPinMidVoltage[module]) ? true : false;
+    // }
 #endif
 }
 

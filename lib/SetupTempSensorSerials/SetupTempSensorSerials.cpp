@@ -18,7 +18,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // arrays to hold device addresses
-DeviceAddress tempSensorSerial[modulesCount + 1];
+DeviceAddress tempSensorSerial[MODULES_COUNT + 1];
 
 SetupTempSensorSerials::SetupTempSensorSerials()
 {
@@ -28,19 +28,20 @@ void SetupTempSensorSerials::init()
 {
     writeOutput.init();
     delay(500);
-    for (byte module = 0; module < modulesCount; module++)
+    for (byte module = 0; module < MODULES_COUNT; module++)
     {
         writeOutput.chargeMosfetOff(module);    // Turn off the Charge Mosfet
         writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
     }
     delay(500);
     Serial.begin(115200);
+    configEEPROM.init();
     Serial.println();
     Serial.println(F("---------------------------------------------------------------------------------------------------"));
     Serial.println(F("ASCD Setup: Temperature Sensors Serial Detection"));
     sensors.begin();
 
-    for (byte i = 0; i < modulesCount + 1; i++)
+    for (byte i = 0; i < MODULES_COUNT + 1; i++)
     {
         Serial.print("Config Module: ");
         Serial.print(i);
@@ -54,13 +55,13 @@ void SetupTempSensorSerials::init()
 void SetupTempSensorSerials::run()
 {
     getTempSensorCount();
-    if (foundTempSensorsCount < modulesCount + 1)
+    if (foundTempSensorsCount < MODULES_COUNT + 1)
     {
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         Serial.print(F("ERROR: Did no detect all the Sensors "));
         Serial.print(foundTempSensorsCount);
         Serial.print(F(" found "));
-        Serial.print(modulesCount + 1);
+        Serial.print(MODULES_COUNT + 1);
         Serial.println(F(" sensors should exist"));
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         while (1)
@@ -69,12 +70,12 @@ void SetupTempSensorSerials::run()
     else
     {
         getTempSensorSerials();
-        if (foundTempSensorsCount < modulesCount + 1)
+        if (foundTempSensorsCount < MODULES_COUNT + 1)
         {
             Serial.print(F("ERROR: Did no detect all the Sensor Serials "));
             Serial.print(foundTempSensorsCount);
             Serial.print(F(" found "));
-            Serial.print(modulesCount + 1);
+            Serial.print(MODULES_COUNT + 1);
             Serial.println(F(" sensors should exist"));
             Serial.println(F("---------------------------------------------------------------------------------------------------"));
             while (1)
@@ -124,7 +125,7 @@ void SetupTempSensorSerials::getTempSensorAverageTemp()
     Serial.println(F("Getting Average Temperature..."));
     Serial.println();
     sensors.requestTemperatures();
-    for (byte i = 0; i < modulesCount + 1; i++)
+    for (byte i = 0; i < MODULES_COUNT + 1; i++)
     {
         sensorTemp = sensors.getTempC(tempSensorSerial[i]);
         Serial.print(F("Sensor "));
@@ -133,7 +134,7 @@ void SetupTempSensorSerials::getTempSensorAverageTemp()
         Serial.println(sensorTemp);
         tempSensorAverageTemp += sensorTemp;
     }
-    tempSensorAverageTemp = tempSensorAverageTemp / (modulesCount + 1);
+    tempSensorAverageTemp = tempSensorAverageTemp / (MODULES_COUNT + 1);
     Serial.println();
     Serial.print(F("Average Temperature: "));
     Serial.println(tempSensorAverageTemp);
@@ -149,11 +150,11 @@ void SetupTempSensorSerials::getTempSensorModule()
         Serial.print(pendingDetection + 1);
         Serial.println(F("-------------------------------------"));
         sensors.requestTemperatures();
-        for (byte i = 0; i < modulesCount + 1; i++)
+        for (byte i = 0; i < MODULES_COUNT + 1; i++)
         {
             if (tempSensorSerialCompleted[i] == false)
             {
-                if (pendingDetection != ((modulesCount + 1) - 1))
+                if (pendingDetection != ((MODULES_COUNT + 1) - 1))
                 {
                     sensorTemp = sensors.getTempC(tempSensorSerial[i]);
                     Serial.print(F("Sensor "));
@@ -197,13 +198,13 @@ void SetupTempSensorSerials::getTempSensorModule()
         // Serial.println(F("---------------------------------------------------------------------------------------------------"));
         // Serial.println(F("Copy and Paste these Addresses into the Arduino Charger / Discharger Sketch"));
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
-        for (byte i = 0; i < modulesCount + 1; i++)
+        for (byte i = 0; i < MODULES_COUNT + 1; i++)
         {
             if (i == 0)
             {
                 printTempSensorSerial(tempSensorSerial[tempSensorSerialOutput[i]], true, false, true);
             }
-            else if (i == (modulesCount + 1 - 1))
+            else if (i == (MODULES_COUNT + 1 - 1))
             {
                 printTempSensorSerial(tempSensorSerial[tempSensorSerialOutput[i]], false, true, false);
             }
@@ -212,13 +213,9 @@ void SetupTempSensorSerials::getTempSensorModule()
                 printTempSensorSerial(tempSensorSerial[tempSensorSerialOutput[i]], false, false, true);
             }
         }
-        Serial.println(F("-------------------------------------"));
 
-        if (configEEPROM.checkEEPROMEmpty() == false)
-        {
-            configEEPROM.readConfigEEPROM(); // EEPROM is not EMPTY -> Load Values into config Struct
-        }
-        for (byte i = 0; i < modulesCount + 1; i++)
+        // Write Sensor Serials to EEPROM
+        for (byte i = 0; i < MODULES_COUNT + 1; i++)
         {
             // Copy to config.dallasSerials -> Config.h
             memcpy(config.dallasSerials[i], tempSensorSerial[tempSensorSerialOutput[i]], 8);
@@ -237,9 +234,8 @@ void SetupTempSensorSerials::printTempSensorSerial(DeviceAddress deviceAddress, 
 {
     if (first)
     {
-        Serial.print(F("DeviceAddress tempSensorSerial["));
-        Serial.print(modulesCount + 1);
-        Serial.println(F("]= {{"));
+        Serial.print(F("uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] ="));
+        Serial.println(F("{{"));
     }
     else
     {

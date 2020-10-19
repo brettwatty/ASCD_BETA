@@ -1,6 +1,6 @@
 #ifndef CYCLE_TIMER_H
 #define CYCLE_TIMER_H
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 
@@ -8,10 +8,10 @@ class CycleTimer
 {
 private:
     // Timmer HH:MM:SS
-    unsigned long millisCleared[modulesCount];
-    byte seconds[modulesCount];
-    byte minutes[modulesCount];
-    byte hours[modulesCount];
+    unsigned long millisCleared[MODULES_COUNT];
+    byte seconds[MODULES_COUNT];
+    byte minutes[MODULES_COUNT];
+    byte hours[MODULES_COUNT];
 
     unsigned long mainCycleMillis;
     unsigned long LCDCycleMillis;
@@ -21,13 +21,14 @@ private:
     unsigned long buttonCycleMillis;
 
     byte moduleActiveLCD;
-    boolean lockActiveLCD;
+    bool lockActiveLCD;
     byte lockActiveLCDCount;
-    boolean serialCycleReady = false;
+    bool serialCycleReady = false;
 
     
 
     // Private Class Functions
+    Config config;
 
 public:
     // Public Class Functions
@@ -42,7 +43,7 @@ public:
 #endif
     void setLCDActiveModule();
     byte getLCDActiveModule();
-    boolean getSerialCycleReady();
+    bool getSerialCycleReady();
     byte getSeconds(byte module);
     byte getMinutes(byte module);
     byte getHours(byte module);

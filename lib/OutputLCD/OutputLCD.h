@@ -1,7 +1,7 @@
 #ifndef OUTPUT_LCD_H
 #define OUTPUT_LCD_H
 
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 

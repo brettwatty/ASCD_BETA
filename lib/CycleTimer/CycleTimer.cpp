@@ -1,4 +1,4 @@
-#include "Config.h"
+// #include <Config.h>
 
 #include <CycleTimer.h>
 
@@ -41,7 +41,7 @@ byte CycleTimer::getLCDActiveModule()
     return moduleActiveLCD;
 }
 
-boolean CycleTimer::getSerialCycleReady()
+bool CycleTimer::getSerialCycleReady()
 {
     return serialCycleReady;
 }
@@ -51,7 +51,7 @@ void CycleTimer::setLCDActiveModule()
     if (lockActiveLCD)
     {
         lockActiveLCDCount = 0;
-        if (moduleActiveLCD == (modulesCount - 1))
+        if (moduleActiveLCD == (MODULES_COUNT - 1))
         {
             moduleActiveLCD = 0;
         }
@@ -83,7 +83,7 @@ void CycleTimer::LCDCycle()
         }
         else
         {
-            if (moduleActiveLCD == (modulesCount - 1))
+            if (moduleActiveLCD == (MODULES_COUNT - 1))
             {
                 moduleActiveLCD = 0;
             }

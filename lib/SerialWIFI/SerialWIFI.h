@@ -1,7 +1,7 @@
 #ifndef SERIAL_WIFI_H
 #define SERIAL_WIFI_H
 
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 
@@ -14,8 +14,8 @@ private:
     char serialSendString[400];
 #endif
 
-    boolean barcodeScanned[modulesCount];
-    boolean insertData[modulesCount];
+    bool barcodeScanned[MODULES_COUNT];
+    bool insertData[MODULES_COUNT];
 
     // Private Class Functions
 
@@ -35,10 +35,10 @@ public:
     void batteryRestSerial(byte module, int milliOhms, byte batteryTemp, byte hours, byte minutes, byte seconds, int batteryVoltage);
     void batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, int batteryInitialVoltage, byte batteryTemp, int batteryVoltage, int dischargeAmps, int dischargeMilliamps, byte batteryHighestTemp, int milliOhms);
     void completeSerial(byte module, byte faultCode, int batteryVoltage);
-    boolean getBarcodeScanned(byte module);
+    bool getBarcodeScanned(byte module);
     void resetBarcodeScanned(byte module);
     void insertDataFlag(byte module);
-    boolean getInsertDataFlag(byte module);
+    bool getInsertDataFlag(byte module);
     void resetInsertDataFlag(byte module);
 };
 

@@ -1,6 +1,7 @@
-#include "Config.h"
-
+// #include <Config.h>
 #include <WriteOutput.h>
+
+
 
 WriteOutput::WriteOutput()
 {
@@ -12,7 +13,7 @@ void WriteOutput::init()
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
 
-    for (byte i = 0; i < modulesCount; i++)
+    for (byte i = 0; i < MODULES_COUNT; i++)
     {
         pinMode(chargeMosfetPins[i], OUTPUT);
         pinMode(dischargeMosfetPins[i], OUTPUT);
@@ -34,7 +35,7 @@ void WriteOutput::init()
     digitalWrite(FAN, LOW);
 
     // Set all pins to LOW
-    for (byte i = 0; i < modulesCount; i++)
+    for (byte i = 0; i < MODULES_COUNT; i++)
     {
         chargeMosfetOff(i);
         dischargeMosfetOff(i);
@@ -62,7 +63,7 @@ void WriteOutput::dischargeMosfetOff(byte module)
     setOutput(dischargeMosfetPins[module], false);
 }
 
-void WriteOutput::setOutput(const byte arrayPin, boolean onOff)
+void WriteOutput::setOutput(const byte arrayPin, bool onOff)
 {
 #if defined(ASCD_MEGA_8X)
     // --------------------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ void WriteOutput::setOutput(const byte arrayPin, boolean onOff)
 }
 
 #if defined(ASCD_NANO_4X)
-void WriteOutput::fanControl(boolean onOff)
+void WriteOutput::fanControl(bool onOff)
 {
     digitalWrite(FAN, (onOff) ? HIGH : LOW);
 }

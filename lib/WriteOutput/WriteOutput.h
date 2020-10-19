@@ -1,7 +1,7 @@
 #ifndef WRITE_OUTPUT_H
 #define WRITE_OUTPUT_H
 
-#include "Config.h"
+#include <Config.h>
 
 #include <Arduino.h>
 
@@ -12,8 +12,8 @@ private:
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
     // Pin Definitions
-    const byte chargeMosfetPins[modulesCount] = {22, 25, 28, 31, 34, 37, 40, 43};
-    const byte dischargeMosfetPins[modulesCount] = {24, 27, 30, 33, 36, 39, 42, 45};
+    const byte chargeMosfetPins[MODULES_COUNT] = {22, 25, 28, 31, 34, 37, 40, 43};
+    const byte dischargeMosfetPins[MODULES_COUNT] = {24, 27, 30, 33, 36, 39, 42, 45};
 
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
@@ -23,8 +23,8 @@ private:
     const byte dataPin = 6;  // Data in (DS) of 74HC595
 
     // Pin Definitions
-    const byte chargeMosfetPins[modulesCount] = {0, 2, 4, 6};
-    const byte dischargeMosfetPins[modulesCount] = {1, 3, 5, 7};
+    const byte chargeMosfetPins[MODULES_COUNT] = {0, 2, 4, 6};
+    const byte dischargeMosfetPins[MODULES_COUNT] = {1, 3, 5, 7};
 
     // Fan pin 5 PWM Digital
     const byte FAN = 5; // Nano 4x PCB Version 1.11+ only
@@ -32,7 +32,7 @@ private:
     byte digitalPinsState = 0b00000000;
 #endif
     // Private Class Functions
-    void setOutput(const byte arrayPin, boolean onOff);
+    void setOutput(const byte arrayPin, bool onOff);
 
 public:
     // Public Class Functions
@@ -43,7 +43,7 @@ public:
     void dischargeMosfetOn(byte module);
     void dischargeMosfetOff(byte module);
 #if defined(ASCD_NANO_4X)
-    void fanControl(boolean onOff);
+    void fanControl(bool onOff);
 #endif
 };
 
