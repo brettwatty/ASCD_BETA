@@ -30,10 +30,10 @@ uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] =
 #elif defined(ASCD_WIFI_CLIENT)
 
 // ASCD_WIFI_CLIENT - Config Settings
-char Config::ssid[33] = "Taihoro";                 // SSID
-char Config::password[33] = "satellite-data#";     // Password
+char Config::ssid[33] = "";                 // SSID
+char Config::password[33] = "";     // Password
 char Config::server[50] = "submit.vortexit.co.nz"; // Server to connect to send and receive data
-char Config::userHash[9] = "c4ca4238";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
+char Config::userHash[9] = "";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
 int Config::CDUnitID = 264;                        // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
 
 #endif
