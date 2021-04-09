@@ -49,6 +49,15 @@ public:
     static char userHash[9];
     static int CDUnitID;
 
+#elif defined(ASCD_WIFI_CLIENT_WEB)
+
+    // ASCD_WIFI_CLIENT - Config Settings
+    static char ssid[33];
+    static char password[33];
+    static char server[50];
+    static char userHash[9];
+    static int CDUnitID;
+
 #endif
 };
 

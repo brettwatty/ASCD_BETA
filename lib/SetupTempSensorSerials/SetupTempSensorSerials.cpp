@@ -234,8 +234,8 @@ void SetupTempSensorSerials::printTempSensorSerial(DeviceAddress deviceAddress, 
 {
     if (first)
     {
-        Serial.print(F("uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] ="));
-        Serial.println(F("{{"));
+        Serial.println(F("uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] = "));
+        Serial.print(F("{{"));
     }
     else
     {

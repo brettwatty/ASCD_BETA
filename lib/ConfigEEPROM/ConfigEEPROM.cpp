@@ -8,16 +8,19 @@ ConfigEEPROM::ConfigEEPROM()
 
 void ConfigEEPROM::init()
 {
+    // clearEEPROM();
+    // clearEEPROMConfig();
     setAddressSize();
     checkEEPROMEmpty();
     Serial.println(F("--------------------------------------------------------"));
     if (emptyEEPROM == false)
     {
-        loadConfigEEPROM(); // EEPROM is not EMPTY -> Load Values into config Struct
+        // loadConfigEEPROM(); // EEPROM is not EMPTY -> Load Values into config Struct
         Serial.println(F("Config Loaded from EEPROM"));
     }
     else
     {
+        // writeCustomConfigEEPROM();
         Serial.println(F("EEPROM Empty - Using values from Config.h"));
     }
     Serial.println(F("--------------------------------------------------------"));
@@ -54,6 +57,7 @@ bool ConfigEEPROM::getEEPROMEmpty()
 
 void ConfigEEPROM::setAddressSize()
 {
+    addressCountEEPROM = 0;
     addressCountEEPROM += sizeof(config.useReferenceVoltage);
     addressCountEEPROM += sizeof(config.referenceVoltage);
     addressCountEEPROM += sizeof(config.internalReferenceVoltage);
@@ -72,6 +76,85 @@ void ConfigEEPROM::setAddressSize()
     addressCountEEPROM += sizeof(config.shuntResistor);
     addressCountEEPROM += sizeof(config.chargeLedPinMidVoltage);
     addressCountEEPROM += sizeof(config.dallasSerials);
+}
+void ConfigEEPROM::clearCustomEEPROM()
+{
+    byte configAddressCountEEPROM = 0;
+    configAddressCountEEPROM += sizeof(config.useReferenceVoltage);
+    configAddressCountEEPROM += sizeof(config.referenceVoltage);
+    configAddressCountEEPROM += sizeof(config.internalReferenceVoltage);
+    configAddressCountEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
+    configAddressCountEEPROM += sizeof(config.storageChargeVoltage);
+    configAddressCountEEPROM += sizeof(config.batteryVoltageLeak);
+    configAddressCountEEPROM += sizeof(config.lowMilliAmps);
+    configAddressCountEEPROM += sizeof(config.highMilliOhms);
+    configAddressCountEEPROM += sizeof(config.offsetMilliOhms);
+    configAddressCountEEPROM += sizeof(config.restTimeMinutes);
+    configAddressCountEEPROM += sizeof(config.chargingTimeout);
+    configAddressCountEEPROM += sizeof(config.tempThreshold);
+    configAddressCountEEPROM += sizeof(config.tempMaxThreshold);
+    configAddressCountEEPROM += sizeof(config.rechargeCycle);
+    configAddressCountEEPROM += sizeof(config.screenTime);
+    configAddressCountEEPROM += sizeof(config.shuntResistor);
+
+    for (byte i = 0; i < configAddressCountEEPROM; i++)
+    {
+        EEPROM.update(i, 255);
+    }
+}
+
+void ConfigEEPROM::writeCustomConfigEEPROM()
+{
+    addressEEPROM = 0;
+    EEPROM.put(addressEEPROM, config.useReferenceVoltage);
+    addressEEPROM += sizeof(config.useReferenceVoltage);
+
+    EEPROM.put(addressEEPROM, config.referenceVoltage);
+    addressEEPROM += sizeof(config.referenceVoltage);
+
+    EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
+    addressEEPROM += sizeof(config.internalReferenceVoltage);
+
+    EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
+    addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
+
+    EEPROM.put(addressEEPROM, config.storageChargeVoltage);
+    addressEEPROM += sizeof(config.storageChargeVoltage);
+
+    EEPROM.put(addressEEPROM, config.batteryVoltageLeak);
+    addressEEPROM += sizeof(config.batteryVoltageLeak);
+
+    EEPROM.put(addressEEPROM, config.lowMilliAmps);
+    addressEEPROM += sizeof(config.lowMilliAmps);
+
+    EEPROM.put(addressEEPROM, config.highMilliOhms);
+    addressEEPROM += sizeof(config.highMilliOhms);
+
+    EEPROM.put(addressEEPROM, config.offsetMilliOhms);
+    addressEEPROM += sizeof(config.offsetMilliOhms);
+
+    EEPROM.put(addressEEPROM, config.restTimeMinutes);
+    addressEEPROM += sizeof(config.restTimeMinutes);
+
+    EEPROM.put(addressEEPROM, config.chargingTimeout);
+    addressEEPROM += sizeof(config.chargingTimeout);
+
+    EEPROM.put(addressEEPROM, config.tempThreshold);
+    addressEEPROM += sizeof(config.tempThreshold);
+
+    EEPROM.put(addressEEPROM, config.tempMaxThreshold);
+    addressEEPROM += sizeof(config.tempMaxThreshold);
+
+    EEPROM.put(addressEEPROM, config.rechargeCycle);
+    addressEEPROM += sizeof(config.rechargeCycle);
+
+    EEPROM.put(addressEEPROM, config.screenTime);
+    addressEEPROM += sizeof(config.screenTime);
+
+    EEPROM.put(addressEEPROM, config.shuntResistor);
+    addressEEPROM += sizeof(config.shuntResistor);
+
+    emptyEEPROM = false;
 }
 
 void ConfigEEPROM::writeConfigEEPROM()

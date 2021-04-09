@@ -19,8 +19,10 @@ public:
     ConfigEEPROM();
     void init();
     void writeConfigEEPROM();
+    void writeCustomConfigEEPROM();
     void loadConfigEEPROM();
-    void clearEEPROM();
+    void clearEEPROM(); // Clears all EEPROM
+    void clearCustomEEPROM(); // Clears all manual Config Variables 
     void checkEEPROMEmpty();
     bool getEEPROMEmpty();
     void setAddressSize();

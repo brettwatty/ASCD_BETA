@@ -3,6 +3,9 @@
 #if defined(ASCD_WIFI_CLIENT)
 #include <ClientWIFI.h>
 ClientWIFI clientWIFI;
+#elif defined(ASCD_WIFI_CLIENT_WEB)
+#include <ClientWIFI_WEB.h>
+ClientWIFI_WEB clientWIFI_WEB;
 #elif defined(SETUP_TEMP_SENSOR_SERIALS)
 #include <SetupTempSensorSerials.h>
 SetupTempSensorSerials setupTempSensorSerials;
@@ -18,6 +21,8 @@ void setup()
 {
 #if defined(ASCD_WIFI_CLIENT)
     clientWIFI.init();
+#elif defined(ASCD_WIFI_CLIENT_WEB)
+    clientWIFI_WEB.init();
 #elif defined(SETUP_TEMP_SENSOR_SERIALS)
     setupTempSensorSerials.init();
 #elif defined(SETUP_CHARGE_LED_MID_VOLTAGE)
@@ -31,6 +36,8 @@ void loop()
 {
 #if defined(ASCD_WIFI_CLIENT)
     clientWIFI.cycleClientWifi();
+#elif defined(ASCD_WIFI_CLIENT_WEB)
+    clientWIFI_WEB.cycleClientWifi();
 #elif defined(SETUP_TEMP_SENSOR_SERIALS)
     setupTempSensorSerials.getTempSensorModule();
 #elif defined(SETUP_CHARGE_LED_MID_VOLTAGE)
