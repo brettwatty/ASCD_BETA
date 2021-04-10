@@ -6,7 +6,7 @@
 #if defined(ASCD_MEGA_8X)
 #define MODULES_COUNT 8 // Number of Modules
 // Add baud rate for Serials - If Online
-#elif defined(ASCD_NANO_4X)
+#elif (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
 #define MODULES_COUNT 4 // Number of Modules
 // Add baud rate for Serials - If Online
 #endif
@@ -18,7 +18,7 @@ public:
     // Public Class Functions
     Config();
     // Public Variables
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
 
     // ASCD_NANO_4X and ASCD_MEGA_8X - Config Settings
     static bool useReferenceVoltage;

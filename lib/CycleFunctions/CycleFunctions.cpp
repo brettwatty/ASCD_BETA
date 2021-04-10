@@ -8,10 +8,11 @@ Cycle::Cycle()
 
 void Cycle::init()
 {
-    // Initialize Classes.
-    
+// Initialize Classes.
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
     outputLCD.init();
     outputLCD.startup();
+#endif
     writeOutput.init();
     inputDevices.init();
     temperature.init();
@@ -19,7 +20,7 @@ void Cycle::init()
     configEEPROM.init();
     readInput.init();
 
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     writeOutput.fanControl(true); // Turn on fan at boot
 #endif
     // Initialize Output Pins / Analog Pins
@@ -351,10 +352,10 @@ void Cycle::milliOhmsCycle(byte module)
         batteryVoltage = 0;
         batteryShuntVoltage = 0;
 
-        batteryVoltage = readInput.batteryVoltage(module);      // Get Battery Voltage with no load
-        writeOutput.dischargeMosfetOn(module);                  // Turn on the Discharge Mosfet
-        batteryShuntVoltage = readInput.batteryVoltage(module); // Get Battery Voltage with load
-        writeOutput.dischargeMosfetOff(module);                 // Turn off the Discharge Mosfet
+        batteryVoltage = readInput.batteryVoltage(module);                                                                                          // Get Battery Voltage with no load
+        writeOutput.dischargeMosfetOn(module);                                                                                                      // Turn on the Discharge Mosfet
+        batteryShuntVoltage = readInput.batteryVoltage(module);                                                                                     // Get Battery Voltage with load
+        writeOutput.dischargeMosfetOff(module);                                                                                                     // Turn off the Discharge Mosfet
         tempMilliOhms = (((batteryVoltage - batteryShuntVoltage) / (batteryShuntVoltage / config.shuntResistor[module]))) + config.offsetMilliOhms; // The Drain-Source On-State Resistance of the Discharge Mosfet
         if (tempMilliOhms > 1000)                                                                                                                   // Max 3 digits on LCD
             tempMilliOhms = 999;
