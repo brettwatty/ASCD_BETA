@@ -14,9 +14,13 @@ void Cycle::init()
     outputLCD.startup();
 #endif
     writeOutput.init();
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     inputDevices.init();
+#endif
     temperature.init();
+#ifdef ONLINE
     serialWIFI.init();
+#endif
     configEEPROM.init();
     readInput.init();
 

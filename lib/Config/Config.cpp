@@ -1,6 +1,6 @@
 #include <Config.h>
 
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
 
 // ASCD_NANO_4X and ASCD_MEGA_8X - Config Settings
 bool Config::useReferenceVoltage = true;        // "true" to use the 5v regulator as the reference voltage or "false" to use the 1.1V internal voltage reference
