@@ -25,9 +25,7 @@ private:
 #define BUTTON_INPUT_MODE INPUT
     // Button pin Analog A1
     const byte BTN = 15;
-// #elif defined(ASCD_LEONARDO_4X)
-
-// #endif
+#endif
     // Private Class Functions
 
 public:

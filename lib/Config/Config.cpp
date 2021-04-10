@@ -2,10 +2,12 @@
 
 #if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
 
-// ASCD_NANO_4X and ASCD_MEGA_8X - Config Settings
-bool Config::useReferenceVoltage = true;        // "true" to use the 5v regulator as the reference voltage or "false" to use the 1.1V internal voltage reference
-int Config::referenceVoltage = 4980;            // 5V output of Arduino
-int Config::internalReferenceVoltage = 1054;    // 1.1V internal voltage reference of Arduino
+// ASCD_NANO_4X ,ASCD_MEGA_8X and ASCD_LEONARDO_4X - Config Settings
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+bool Config::useReferenceVoltage = true;     // "true" to use the 5v regulator as the reference voltage or "false" to use the 1.1V internal voltage reference
+int Config::referenceVoltage = 4980;         // 5V output of Arduino
+int Config::internalReferenceVoltage = 1054; // 1.1V internal voltage reference of Arduino
+#endif
 int Config::defaultBatteryCutOffVoltage = 2800; // Voltage that the discharge stops
 int Config::storageChargeVoltage = 3800;        // Storage charge voltage for recharge cycle. Use 0.00 for no storage charge. Can't be greater than 3.80v
 int Config::batteryVoltageLeak = 500;           // On the initial screen "BATTERY CHECK" observe the highest voltage of each module and set this value slightly higher
@@ -30,21 +32,20 @@ uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] =
 #elif defined(ASCD_WIFI_CLIENT)
 
 // ASCD_WIFI_CLIENT - Config Settings
-char Config::ssid[33] = "";              // SSID
-char Config::password[33] = "";          // Password
+char Config::ssid[33] = "";                        // SSID
+char Config::password[33] = "";                    // Password
 char Config::server[50] = "submit.vortexit.co.nz"; // Server to connect to send and receive data
-char Config::userHash[9] = "c4ca4238";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
-int Config::CDUnitID = 264;                        // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
-
+char Config::userHash[9] = "";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
+int Config::CDUnitID = 0;                        // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
 
 #elif defined(ASCD_WIFI_CLIENT_WEB)
 
 // ASCD_WIFI_CLIENT - Config Settings
-char Config::ssid[33] = "";              // SSID
-char Config::password[33] = "";          // Password
+char Config::ssid[33] = "";                        // SSID
+char Config::password[33] = "";                    // Password
 char Config::server[50] = "submit.vortexit.co.nz"; // Server to connect to send and receive data
-char Config::userHash[9] = "";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
-int Config::CDUnitID = 0;                        // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
+char Config::userHash[9] = "";                     // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
+int Config::CDUnitID = 0;                          // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
 
 #endif
 
