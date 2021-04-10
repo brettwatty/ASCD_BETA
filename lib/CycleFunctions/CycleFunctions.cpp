@@ -9,7 +9,7 @@ Cycle::Cycle()
 void Cycle::init()
 {
 // Initialize Classes.
-#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     outputLCD.init();
     outputLCD.startup();
 #endif

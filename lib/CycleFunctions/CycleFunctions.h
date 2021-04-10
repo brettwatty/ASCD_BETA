@@ -4,16 +4,21 @@
 #include <Config.h>
 
 #include <Arduino.h>
-#include <ReadInput.h>
-#include <WriteOutput.h>
-#include <OutputLCD.h>
-#include <CycleTimer.h>
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 #include <Buzzer.h>
-#include <Temperature.h>
+#include <OutputLCD.h>
 #include <InputDevices.h>
-#include <SerialWIFI.h>
-#include <ConfigEEPROM.h>
+#endif
 
+#ifdef ONLINE
+#include <SerialWIFI.h>
+#endif
+
+#include <WriteOutput.h>
+#include <CycleTimer.h>
+#include <Temperature.h>
+#include <ReadInput.h>
+#include <ConfigEEPROM.h>
 
 class Cycle
 {
@@ -35,29 +40,35 @@ private:
 
     byte faultCode[MODULES_COUNT];
 
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     // Fan Variables
     bool fanOn = false;
 #endif
-#if defined(ONLINE)
+#ifdef ONLINE
     // Serial Variables
     bool readSerialResponse = false;
     byte countSerialSend = 0;
 #endif
 
-    // Private Class Functions
-    Config config;
-    ReadInput readInput;
-    WriteOutput writeOutput;
-    OutputLCD outputLCD;
-    CycleTimer cycleTimer;
-    Buzzer buzzer;
-    Temperature temperature;
-    InputDevices inputDevices;
-    SerialWIFI serialWIFI;
-    ConfigEEPROM configEEPROM;
+// Private Class Functions
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+        OutputLCD outputLCD;
+        InputDevices inputDevices;
+#endif
 
-    
+#if defined(ASCD_NANO_4X)
+    Buzzer buzzer;
+#endif
+
+#if defined(ONLINE)
+    SerialWIFI serialWIFI;
+#endif
+    Config config;
+    WriteOutput writeOutput;
+    CycleTimer cycleTimer;
+    Temperature temperature;
+    ReadInput readInput;
+    ConfigEEPROM configEEPROM;
 
     void mainCycle();
     void nextCycle(byte module);
