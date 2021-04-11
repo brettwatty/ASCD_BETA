@@ -34,10 +34,11 @@ private:
     // --------------------------------------------------------------------------------------------------
     // ASCD Leonardo 4x
     // Pin Definitions
+    // ********* Need to add LED pins
     const byte chargeMosfetPins[MODULES_COUNT] = {14, 5, 9, 6};
     const byte dischargeMosfetPins[MODULES_COUNT] = {19, 18, 17, 16};
 
-    // Fan pin 5 PWM Digital
+    // Fan pin 15 Digital
     const byte FAN = 15; // A1
 #endif
     // Private Class Functions
