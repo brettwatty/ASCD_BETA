@@ -16,6 +16,8 @@ private:
     const int8_t temperatureOffset[MODULES_COUNT + 1] = {0, 0, 0, 0, 0, 0, 0, 0, 0}; // Offset for Temperature sensors in + / - 1 e.g. 5: for readings 5 degrees celsius under. -2 equals for readings 2 degrees celsius over
 #elif defined(ASCD_NANO_4X)
     const int8_t temperatureOffset[MODULES_COUNT + 1] = {0, 0, 0, 0, 0}; // Offset for Temperature sensors in + / - 1 e.g. 5: for readings 5 degrees celsius under. -2 equals for readings 2 degrees celsius over
+#elif defined(ASCD_LEONARDO_4X)
+const int8_t temperatureOffset[MODULES_COUNT] = {0, 0, 0, 0}; // Offset for Temperature sensors in + / - 1 e.g. 5: for readings 5 degrees celsius under. -2 equals for readings 2 degrees celsius over
 #endif
     // Private Class Functions
     Config config;

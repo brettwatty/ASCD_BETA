@@ -5,6 +5,12 @@
 #include <ConfigEEPROM.h>
 #include <Arduino.h>
 
+#if defined(ASCD_LEONARDO_4X)
+#include <Wire.h>
+#include <SparkFun_ADS1015_Arduino_Library.h>
+#include <Smoothed.h>
+#endif
+
 class ReadInput
 {
 private:
@@ -17,6 +23,7 @@ private:
     const byte batteryVoltageDropPin[MODULES_COUNT] = {A1, A3, A5, A7, A9, A11, A13, A15};
     const byte chargeLedPin[MODULES_COUNT] = {23, 26, 29, 32, 35, 38, 41, 44};
 
+    // Private Class Functions
     int getInput(const byte arrayPin);
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
@@ -40,6 +47,16 @@ private:
     // Private Class Functions
 
     int getInput(const bool arrayPins[]);
+#elif defined(ASCD_LEONARDO_4X)
+
+
+
+    const byte batteryVoltagePin[MODULES_COUNT] = {0, 1, 2, 3};
+    const byte batteryVoltageDropPin[MODULES_COUNT] = {0, 1, 2, 3};
+    const byte chargeLedPin[MODULES_COUNT] = {13, 10, 8, 4};
+
+    // Private Class Functions
+    int getInput(const byte arrayPin);
 #endif
 
     // Private Class Functions

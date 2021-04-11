@@ -40,17 +40,22 @@ void Cycle::init()
         readInput.batteryVoltageDrop(module);
         temperature.getTemperature(module, true);
     }
-
+    #ifndef ASCD_LEONARDO_4X
     temperature.getAmbientTemperature();
+    #endif
     delay(2000);
-#if defined(ASCD_NANO_4X)
-    buzzer.init();
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     writeOutput.fanControl(false); // Turn off fan on boot
 #endif
+#if defined(ASCD_NANO_4X)
+buzzer.init();
+#endif
+
 }
 
 void Cycle::cycleRun()
 {
+#if defined(ASCD_NANO_4X)
     if (cycleTimer.buttonCycle())
     {
         if (inputDevices.button())
@@ -60,6 +65,7 @@ void Cycle::cycleRun()
             mainCycle();
         }
     }
+#endif
     cycleTimer.LCDCycle();
 #if defined(ONLINE)
     serialWIFI.readSerial();
@@ -79,12 +85,14 @@ void Cycle::cycleRun()
 
 void Cycle::mainCycle()
 {
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     fanOn = false;
 #endif
 #if defined(ONLINE)
     serialWIFI.clearSerialSendString();
+    #ifndef ASCD_LEONARDO_4X
     serialWIFI.ambientTemperatureSerial(temperature.getAmbientTemperature());
+    #endif
 #endif
     for (int module = 0; module < MODULES_COUNT; module++)
     {
@@ -113,7 +121,7 @@ void Cycle::mainCycle()
                 break;
             }
             batteryCharge(module, true); // True for Charge cycle False for Recharge cycle
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
             fanOn = true;
 #endif
             break;
@@ -133,7 +141,7 @@ void Cycle::mainCycle()
                 break;
             }
             dischargeCycle(module);
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
             fanOn = true;
 #endif
             break;
@@ -152,7 +160,7 @@ void Cycle::mainCycle()
                 break;
             }
             batteryCharge(module, false); // True for Charge cycle False for Recharge cycle
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
             fanOn = true;
 #endif
             break;
@@ -161,7 +169,7 @@ void Cycle::mainCycle()
             break;
         }
     }
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     writeOutput.fanControl((fanOn) ? true : false); // Checks if any module is charging or discharging and turn on fan or turn off
 #endif
 }
@@ -246,7 +254,9 @@ void Cycle::nextCycle(byte module)
         faultCode[module] = 0;               // Set the Battery Fault Code to 0 No Faults
         cycleState[module] = 7;              // Successfully completed. Got to next cycle
         batteryInitialVoltage[module] = readInput.batteryVoltage(module);
+#if defined(ASCD_NANO_4X)
         buzzer.buzzerFinished();
+#endif
         break;
     case 7: // Completed
         // Re-Initialize Variables - Batter removed - Restart the Cycle
@@ -277,7 +287,9 @@ void Cycle::processFault(byte module)
     writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
     cycleTimer.clearTimer(module);
     cycleState[module] = 7;
+#if defined(ASCD_NANO_4X)
     buzzer.buzzerFinished();
+#endif
 }
 
 void Cycle::batteryCheck(byte module)
@@ -285,7 +297,9 @@ void Cycle::batteryCheck(byte module)
     batteryVoltage = readInput.batteryVoltage(module);
     if (cycleTimer.getLCDActiveModule() == module)
     {
+        #ifndef ASCD_LEONARDO_4X
         outputLCD.batteryCheckLCD(module, batteryVoltage);
+        #endif
     }
 #if defined(ONLINE)
     serialWIFI.batteryCheckSerial(module);
@@ -341,7 +355,9 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
     }
     if (cycleTimer.getLCDActiveModule() == module)
     {
+        #ifndef ASCD_LEONARDO_4X
         outputLCD.batteryChargeLCD(module, chargeRecharge, batteryVoltage, batteryInitialVoltage[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
+        #endif
     }
 #if defined(ONLINE)
     serialWIFI.batteryChargeSerial(module, chargeRecharge, temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), batteryVoltage, temperature.getHighestTemp(module));
@@ -365,7 +381,9 @@ void Cycle::milliOhmsCycle(byte module)
             tempMilliOhms = 999;
         if (cycleTimer.getLCDActiveModule() == module)
         {
+            #ifndef ASCD_LEONARDO_4X
             outputLCD.milliOhmsLCD(module, tempMilliOhms);
+            #endif
         }
 #if defined(ONLINE)
         serialWIFI.milliOhmsSerial(module, tempMilliOhms, batteryVoltage);
@@ -385,7 +403,9 @@ void Cycle::restCycle(byte module)
     batteryVoltage = readInput.batteryVoltage(module); // Get Battery Voltage
     if (cycleTimer.getLCDActiveModule() == module)
     {
+        #ifndef ASCD_LEONARDO_4X
         outputLCD.batteryRestLCD(module, batteryVoltage, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
+        #endif
     }
 #if defined(ONLINE)
     serialWIFI.batteryRestSerial(module, milliOhms[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), batteryVoltage);
@@ -420,7 +440,9 @@ void Cycle::dischargeCycle(byte module)
         dischargeMilliSecondsPrevious[module] = millis();
         if (cycleTimer.getLCDActiveModule() == module)
         {
+            #ifndef ASCD_LEONARDO_4X
             outputLCD.batteryDischargeLCD(module, batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
+            #endif
         }
 #if defined(ONLINE)
         serialWIFI.batteryDischargeSerial(module, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module), temperature.getInitialTemp(module), batteryInitialVoltage[module], temperature.getCurrentTemp(module), batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getHighestTemp(module), milliOhms[module]);
@@ -451,7 +473,9 @@ void Cycle::completeCycle(byte module)
     batteryVoltage = readInput.batteryVoltage(module);
     if (cycleTimer.getLCDActiveModule() == module)
     {
+        #ifndef ASCD_LEONARDO_4X
         outputLCD.completeLCD(module, faultCode[module], milliOhms[module], dischargeMilliamps[module], batteryVoltage);
+        #endif
     }
 #if defined(ONLINE)
     serialWIFI.completeSerial(module, faultCode[module], batteryVoltage);

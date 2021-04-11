@@ -5,12 +5,15 @@
 
 #include <Arduino.h>
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-#include <Buzzer.h>
 #include <OutputLCD.h>
 #include <InputDevices.h>
 #endif
 
-#ifdef ONLINE
+#if defined(ASCD_NANO_4X)
+#include <Buzzer.h>
+#endif
+
+#if defined(ONLINE)
 #include <SerialWIFI.h>
 #endif
 

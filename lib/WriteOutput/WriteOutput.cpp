@@ -9,7 +9,7 @@ WriteOutput::WriteOutput()
 
 void WriteOutput::init()
 {
-#if defined(ASCD_MEGA_8X)
+#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X)) 
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
 
@@ -39,7 +39,7 @@ void WriteOutput::init()
     {
         chargeMosfetOff(i);
         dischargeMosfetOff(i);
-    }
+    } 
 #endif
 }
 

@@ -20,7 +20,6 @@ void ReadInput::init()
         pinMode(batteryVoltageDropPin[i], INPUT); // Analog reading discharge resistor Battery positive terminal
         pinMode(chargeLedPin[i], INPUT_PULLUP);   // Charge LED Digital reading from TP4056
     }
-    // #error "ASCD_MEGA_8X"
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
@@ -34,7 +33,12 @@ void ReadInput::init()
     digitalWrite(S2, LOW);
     digitalWrite(S3, LOW);
     pinMode(SIG, INPUT); // Analog Mux SIG pin A0
-    // #error "ASCD_NANO_4X"
+
+#elif defined(ASCD_LEONARDO_4X)
+    for (byte i = 0; i < MODULES_COUNT; i++)
+    {
+        pinMode(chargeLedPin[i], INPUT_PULLUP);
+    }
 #endif
 }
 
@@ -62,14 +66,11 @@ bool ReadInput::chargeLed(byte module)
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
-    // if (configEEPROM.checkEEPROMEmpty() == true)
-    // {
-        return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
-    // }
-    // else
-    // {
-    //     return (getInput(chargeLedPin[module]) >= configEEPROM.chargeLedPinMidVoltage[module]) ? true : false;
-    // }
+    return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
+#elif defined(ASCD_LEONARDO_4X)
+    // --------------------------------------------------------------------------------------------------
+    // ASCD Leonardo 4x
+    return true; // temp placement
 #endif
 }
 
@@ -79,7 +80,7 @@ int ReadInput::getInput(const byte arrayPin)
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
     // Read the value at the SIG pin 10x and convert to voltage
-    int batterySampleVoltage = 0;
+    unsigned int batterySampleVoltage = 0;
     for (byte i = 0; i < 10; i++)
     {
         if (config.useReferenceVoltage)
@@ -91,6 +92,9 @@ int ReadInput::getInput(const byte arrayPin)
             batterySampleVoltage = batterySampleVoltage + (analogRead(arrayPin) * (readVcc()));
         }
     }
+
+    return batterySampleVoltage / 10; // Calculate and return the Voltage Reading
+}
 #elif defined(ASCD_NANO_4X)
 // --------------------------------------------------------------------------------------------------
 // ASCD Nano 4x
@@ -117,9 +121,15 @@ int ReadInput::getInput(const bool arrayPins[])
             batterySampleVoltage = batterySampleVoltage + (analogRead(SIG) * readVcc() * 1000);
         }
     }
-#endif
     return batterySampleVoltage / 10; // Calculate and return the Voltage Reading
 }
+#elif defined(ASCD_LEONARDO_4X)
+int ReadInput::getInput(const byte arrayPin)
+{
+    unsigned int batterySampleVoltage = 42; // temp need ADS function to read volatge
+    return batterySampleVoltage / 10; // Calculate and return the Voltage Reading
+}
+#endif
 
 float ReadInput::readVcc()
 {

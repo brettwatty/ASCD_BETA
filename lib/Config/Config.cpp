@@ -21,22 +21,31 @@ byte Config::tempMaxThreshold = 10;             // Maximum Threshold in degrees 
 bool Config::rechargeCycle = true;              // Run the Recharge Cycle "true" to run and "false" to skip to Completed Cycle
 byte Config::screenTime = 4;                    // Time in Seconds (Cycles) per Active Screen
 int Config::shuntResistor[MODULES_COUNT] = {3330, 3330, 3380, 3370};
+#if defined(ASCD_NANO_4X)
 int Config::chargeLedPinMidVoltage[MODULES_COUNT] = {2040, 2090, 2150, 2090}; // Array for each Mid On / Off Voltage of the TP5100 Charge LED Pins
+#endif
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] =
     {{0x28, 0xE3, 0x11, 0x79, 0xA2, 0x01, 0x03, 0x7B},
      {0x28, 0x84, 0x35, 0x79, 0xA2, 0x01, 0x03, 0xDA},
      {0x28, 0xCF, 0x41, 0x79, 0xA2, 0x01, 0x03, 0x25},
      {0x28, 0xA4, 0x8A, 0x79, 0xA2, 0x00, 0x03, 0x88},
      {0x28, 0xB9, 0x84, 0x79, 0xA2, 0x00, 0x03, 0x3B}};
-
+#elif defined(ASCD_LEONARDO_4X) // No Ambient sensor
+uint8_t Config::dallasSerials[MODULES_COUNT][8] =
+    {{0x28, 0xE3, 0x11, 0x79, 0xA2, 0x01, 0x03, 0x7B},
+     {0x28, 0x84, 0x35, 0x79, 0xA2, 0x01, 0x03, 0xDA},
+     {0x28, 0xCF, 0x41, 0x79, 0xA2, 0x01, 0x03, 0x25},
+     {0x28, 0xA4, 0x8A, 0x79, 0xA2, 0x00, 0x03, 0x88}};
+#endif
 #elif defined(ASCD_WIFI_CLIENT)
 
 // ASCD_WIFI_CLIENT - Config Settings
 char Config::ssid[33] = "";                        // SSID
 char Config::password[33] = "";                    // Password
 char Config::server[50] = "submit.vortexit.co.nz"; // Server to connect to send and receive data
-char Config::userHash[9] = "";             // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
-int Config::CDUnitID = 0;                        // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
+char Config::userHash[9] = "";                     // Database Hash - this is unique per user - Get this from Charger / Discharger Menu -> View
+int Config::CDUnitID = 0;                          // CDUnitID this is the Units ID - this is unique per user - Get this from Charger / Discharger Menu -> View -> Select your Charger / Discharger
 
 #elif defined(ASCD_WIFI_CLIENT_WEB)
 

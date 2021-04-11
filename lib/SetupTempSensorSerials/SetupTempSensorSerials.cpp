@@ -2,13 +2,18 @@
 
 // #define TEMPERATURE_PRECISION 9
 #if defined(ASCD_MEGA_8X)
+#define TEMP_SENSENSORS_COUNT 9
 #if defined(MEGA_1X)
 #define ONE_WIRE_BUS 2 // Pin 2 Temperature Sensors - ASCD MEGA PCB Version 1.1
 #elif defined(MEGA_2X)
 #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD MEGA PCB Version 2.0+
 #endif
 #elif defined(ASCD_NANO_4X)
+#define TEMP_SENSENSORS_COUNT 5
 #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD NANO All Versions
+#elif defined(ASCD_LEONARDO_4X)
+#define TEMP_SENSENSORS_COUNT 4
+#define ONE_WIRE_BUS 12 // Pin 12 Temperature Sensors - ASCD LEONARDO 4X
 #endif
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -18,7 +23,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 // arrays to hold device addresses
-DeviceAddress tempSensorSerial[MODULES_COUNT + 1];
+DeviceAddress tempSensorSerial[TEMP_SENSENSORS_COUNT];
 
 SetupTempSensorSerials::SetupTempSensorSerials()
 {
@@ -41,7 +46,7 @@ void SetupTempSensorSerials::init()
     Serial.println(F("ASCD Setup: Temperature Sensors Serial Detection"));
     sensors.begin();
 
-    for (byte i = 0; i < MODULES_COUNT + 1; i++)
+    for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
     {
         Serial.print("Config Module: ");
         Serial.print(i);
@@ -55,13 +60,13 @@ void SetupTempSensorSerials::init()
 void SetupTempSensorSerials::run()
 {
     getTempSensorCount();
-    if (foundTempSensorsCount < MODULES_COUNT + 1)
+    if (foundTempSensorsCount < TEMP_SENSENSORS_COUNT)
     {
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         Serial.print(F("ERROR: Did no detect all the Sensors "));
         Serial.print(foundTempSensorsCount);
         Serial.print(F(" found "));
-        Serial.print(MODULES_COUNT + 1);
+        Serial.print(TEMP_SENSENSORS_COUNT);
         Serial.println(F(" sensors should exist"));
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         while (1)
@@ -70,12 +75,12 @@ void SetupTempSensorSerials::run()
     else
     {
         getTempSensorSerials();
-        if (foundTempSensorsCount < MODULES_COUNT + 1)
+        if (foundTempSensorsCount < TEMP_SENSENSORS_COUNT)
         {
             Serial.print(F("ERROR: Did no detect all the Sensor Serials "));
             Serial.print(foundTempSensorsCount);
             Serial.print(F(" found "));
-            Serial.print(MODULES_COUNT + 1);
+            Serial.print(TEMP_SENSENSORS_COUNT);
             Serial.println(F(" sensors should exist"));
             Serial.println(F("---------------------------------------------------------------------------------------------------"));
             while (1)
@@ -125,7 +130,7 @@ void SetupTempSensorSerials::getTempSensorAverageTemp()
     Serial.println(F("Getting Average Temperature..."));
     Serial.println();
     sensors.requestTemperatures();
-    for (byte i = 0; i < MODULES_COUNT + 1; i++)
+    for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
     {
         sensorTemp = sensors.getTempC(tempSensorSerial[i]);
         Serial.print(F("Sensor "));
@@ -134,7 +139,7 @@ void SetupTempSensorSerials::getTempSensorAverageTemp()
         Serial.println(sensorTemp);
         tempSensorAverageTemp += sensorTemp;
     }
-    tempSensorAverageTemp = tempSensorAverageTemp / (MODULES_COUNT + 1);
+    tempSensorAverageTemp = tempSensorAverageTemp / (TEMP_SENSENSORS_COUNT);
     Serial.println();
     Serial.print(F("Average Temperature: "));
     Serial.println(tempSensorAverageTemp);
@@ -150,11 +155,11 @@ void SetupTempSensorSerials::getTempSensorModule()
         Serial.print(pendingDetection + 1);
         Serial.println(F("-------------------------------------"));
         sensors.requestTemperatures();
-        for (byte i = 0; i < MODULES_COUNT + 1; i++)
+        for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
         {
             if (tempSensorSerialCompleted[i] == false)
             {
-                if (pendingDetection != ((MODULES_COUNT + 1) - 1))
+                if (pendingDetection != ((TEMP_SENSENSORS_COUNT) - 1))
                 {
                     sensorTemp = sensors.getTempC(tempSensorSerial[i]);
                     Serial.print(F("Sensor "));
@@ -198,13 +203,13 @@ void SetupTempSensorSerials::getTempSensorModule()
         // Serial.println(F("---------------------------------------------------------------------------------------------------"));
         // Serial.println(F("Copy and Paste these Addresses into the Arduino Charger / Discharger Sketch"));
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
-        for (byte i = 0; i < MODULES_COUNT + 1; i++)
+        for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
         {
             if (i == 0)
             {
                 printTempSensorSerial(tempSensorSerial[tempSensorSerialOutput[i]], true, false, true);
             }
-            else if (i == (MODULES_COUNT + 1 - 1))
+            else if (i == (TEMP_SENSENSORS_COUNT - 1))
             {
                 printTempSensorSerial(tempSensorSerial[tempSensorSerialOutput[i]], false, true, false);
             }
@@ -215,7 +220,7 @@ void SetupTempSensorSerials::getTempSensorModule()
         }
 
         // Write Sensor Serials to EEPROM
-        for (byte i = 0; i < MODULES_COUNT + 1; i++)
+        for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
         {
             // Copy to config.dallasSerials -> Config.h
             memcpy(config.dallasSerials[i], tempSensorSerial[tempSensorSerialOutput[i]], 8);
@@ -234,7 +239,7 @@ void SetupTempSensorSerials::printTempSensorSerial(DeviceAddress deviceAddress, 
 {
     if (first)
     {
-        Serial.println(F("uint8_t Config::dallasSerials[MODULES_COUNT + 1][8] = "));
+        Serial.println(F("uint8_t Config::dallasSerials[TEMP_SENSENSORS_COUNT][8] = "));
         Serial.print(F("{{"));
     }
     else

@@ -27,9 +27,18 @@ private:
     const byte dischargeMosfetPins[MODULES_COUNT] = {1, 3, 5, 7};
 
     // Fan pin 5 PWM Digital
-    const byte FAN = 5; // Nano 4x PCB Version 1.11+ only
+    const byte FAN = 5; // Leonardo Nano 4x PCB Version 1.11+ only
 
     byte digitalPinsState = 0b00000000;
+#elif defined(ASCD_LEONARDO_4X)
+    // --------------------------------------------------------------------------------------------------
+    // ASCD Leonardo 4x
+    // Pin Definitions
+    const byte chargeMosfetPins[MODULES_COUNT] = {14, 5, 9, 6};
+    const byte dischargeMosfetPins[MODULES_COUNT] = {19, 18, 17, 16};
+
+    // Fan pin 5 PWM Digital
+    const byte FAN = 15; // A1
 #endif
     // Private Class Functions
     void setOutput(const byte arrayPin, bool onOff);
@@ -42,7 +51,7 @@ public:
     void chargeMosfetOff(byte module);
     void dischargeMosfetOn(byte module);
     void dischargeMosfetOff(byte module);
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     void fanControl(bool onOff);
 #endif
 };
