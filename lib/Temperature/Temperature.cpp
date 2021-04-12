@@ -5,22 +5,23 @@
 
 // #define TEMPERATURE_PRECISION 9
 
-#if defined(ASCD_MEGA_8X)
-#define TEMP_SENSENSORS_COUNT 9
-#define AMBIENT_TEMP_SENSOR
-#if defined(MEGA_1X)
-#define ONE_WIRE_BUS 2 // Pin 2 Temperature Sensors - ASCD MEGA PCB Version 1.1
-#elif defined(MEGA_2X)
-#define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD MEGA PCB Version 2.0+
-#endif
-#elif defined(ASCD_NANO_4X)
-#define TEMP_SENSENSORS_COUNT 5
-#define AMBIENT_TEMP_SENSOR
-#define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD NANO All Versions
-#elif defined(ASCD_LEONARDO_4X)
-#define TEMP_SENSENSORS_COUNT 4
-#define ONE_WIRE_BUS 12 // Pin 12 Temperature Sensors - ASCD LEONARDO 4X
-#endif
+// // This needs to be added to the Config
+// #if defined(ASCD_MEGA_8X)
+// #define TEMP_SENSENSORS_COUNT 9
+// #define AMBIENT_TEMP_SENSOR
+// #if defined(MEGA_1X)
+// #define ONE_WIRE_BUS 2 // Pin 2 Temperature Sensors - ASCD MEGA PCB Version 1.1
+// #elif defined(MEGA_2X)
+// #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD MEGA PCB Version 2.0+
+// #endif
+// #elif defined(ASCD_NANO_4X)
+// #define TEMP_SENSENSORS_COUNT 5
+// #define AMBIENT_TEMP_SENSOR
+// #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD NANO All Versions
+// #elif defined(ASCD_LEONARDO_4X)
+// #define TEMP_SENSENSORS_COUNT 4
+// #define ONE_WIRE_BUS 12 // Pin 12 Temperature Sensors - ASCD LEONARDO 4X
+// #endif
 
 // **** prob need "new"    _oneWire = new OneWire(12);          _sensors = new DallasTemperature(_oneWire);
 OneWire oneWire(ONE_WIRE_BUS);                         // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
@@ -114,7 +115,7 @@ byte Temperature::getAmbientTemperature()
     getTemperature(MODULES_COUNT, false); // MODULES_COUNT is the ambient temp sensor array pointer. 0-3 / 0-7 are the modules pointers and 4 or 8 is the 5th or 9th temp sensor
     return batteryCurrentTemp[MODULES_COUNT];
 }
-#elif
+#endif
 
 byte Temperature::getCurrentTemp(byte module)
 {

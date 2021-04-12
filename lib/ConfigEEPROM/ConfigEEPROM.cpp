@@ -1,4 +1,3 @@
-// #include <Config.h>
 #include <ConfigEEPROM.h>
 #include <EEPROM.h>
 
@@ -58,9 +57,11 @@ bool ConfigEEPROM::getEEPROMEmpty()
 void ConfigEEPROM::setAddressSize()
 {
     addressCountEEPROM = 0;
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     addressCountEEPROM += sizeof(config.useReferenceVoltage);
     addressCountEEPROM += sizeof(config.referenceVoltage);
     addressCountEEPROM += sizeof(config.internalReferenceVoltage);
+#endif
     addressCountEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
     addressCountEEPROM += sizeof(config.storageChargeVoltage);
     addressCountEEPROM += sizeof(config.batteryVoltageLeak);
@@ -74,15 +75,19 @@ void ConfigEEPROM::setAddressSize()
     addressCountEEPROM += sizeof(config.rechargeCycle);
     addressCountEEPROM += sizeof(config.screenTime);
     addressCountEEPROM += sizeof(config.shuntResistor);
+#if defined(ASCD_NANO_4X)
     addressCountEEPROM += sizeof(config.chargeLedPinMidVoltage);
+#endif
     addressCountEEPROM += sizeof(config.dallasSerials);
 }
 void ConfigEEPROM::clearCustomEEPROM()
 {
     byte configAddressCountEEPROM = 0;
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     configAddressCountEEPROM += sizeof(config.useReferenceVoltage);
     configAddressCountEEPROM += sizeof(config.referenceVoltage);
     configAddressCountEEPROM += sizeof(config.internalReferenceVoltage);
+#endif
     configAddressCountEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
     configAddressCountEEPROM += sizeof(config.storageChargeVoltage);
     configAddressCountEEPROM += sizeof(config.batteryVoltageLeak);
@@ -106,6 +111,7 @@ void ConfigEEPROM::clearCustomEEPROM()
 void ConfigEEPROM::writeCustomConfigEEPROM()
 {
     addressEEPROM = 0;
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     EEPROM.put(addressEEPROM, config.useReferenceVoltage);
     addressEEPROM += sizeof(config.useReferenceVoltage);
 
@@ -114,7 +120,7 @@ void ConfigEEPROM::writeCustomConfigEEPROM()
 
     EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
     addressEEPROM += sizeof(config.internalReferenceVoltage);
-
+#endif
     EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
     addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
 
@@ -160,6 +166,7 @@ void ConfigEEPROM::writeCustomConfigEEPROM()
 void ConfigEEPROM::writeConfigEEPROM()
 {
     addressEEPROM = 0;
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     EEPROM.put(addressEEPROM, config.useReferenceVoltage);
     addressEEPROM += sizeof(config.useReferenceVoltage);
 
@@ -168,7 +175,7 @@ void ConfigEEPROM::writeConfigEEPROM()
 
     EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
     addressEEPROM += sizeof(config.internalReferenceVoltage);
-
+#endif
     EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
     addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
 
@@ -207,10 +214,10 @@ void ConfigEEPROM::writeConfigEEPROM()
 
     EEPROM.put(addressEEPROM, config.shuntResistor);
     addressEEPROM += sizeof(config.shuntResistor);
-
+#if defined(ASCD_NANO_4X)
     EEPROM.put(addressEEPROM, config.chargeLedPinMidVoltage);
     addressEEPROM += sizeof(config.chargeLedPinMidVoltage);
-
+#endif
     EEPROM.put(addressEEPROM, config.dallasSerials);
 
     emptyEEPROM = false;
@@ -218,6 +225,7 @@ void ConfigEEPROM::writeConfigEEPROM()
 
 void ConfigEEPROM::loadConfigEEPROM()
 {
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     addressEEPROM = 0;
     EEPROM.get(addressEEPROM, config.useReferenceVoltage);
     addressEEPROM += sizeof(config.useReferenceVoltage);
@@ -227,7 +235,7 @@ void ConfigEEPROM::loadConfigEEPROM()
 
     EEPROM.get(addressEEPROM, config.internalReferenceVoltage);
     addressEEPROM += sizeof(config.internalReferenceVoltage);
-
+#endif
     EEPROM.get(addressEEPROM, config.defaultBatteryCutOffVoltage);
     addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
 
@@ -266,10 +274,10 @@ void ConfigEEPROM::loadConfigEEPROM()
 
     EEPROM.get(addressEEPROM, config.shuntResistor);
     addressEEPROM += sizeof(config.shuntResistor);
-
+#if defined(ASCD_NANO_4X)
     EEPROM.get(addressEEPROM, config.chargeLedPinMidVoltage);
     addressEEPROM += sizeof(config.chargeLedPinMidVoltage);
-
+#endif
     EEPROM.get(addressEEPROM, config.dallasSerials);
 }
 

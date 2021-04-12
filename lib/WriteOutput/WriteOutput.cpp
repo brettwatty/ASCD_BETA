@@ -79,7 +79,7 @@ void WriteOutput::setOutput(const byte arrayPin, bool onOff)
 #endif
 }
 
-#if defined(ASCD_NANO_4X)
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X)) 
 void WriteOutput::fanControl(bool onOff)
 {
     digitalWrite(FAN, (onOff) ? HIGH : LOW);

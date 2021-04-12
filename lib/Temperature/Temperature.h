@@ -31,7 +31,7 @@ public:
     byte processTemperature(byte module);
 #if defined(AMBIENT_TEMP_SENSOR)
     byte getAmbientTemperature();
-#elif
+#endif
     byte getCurrentTemp(byte module);
     byte getInitialTemp(byte module);
     byte getHighestTemp(byte module);

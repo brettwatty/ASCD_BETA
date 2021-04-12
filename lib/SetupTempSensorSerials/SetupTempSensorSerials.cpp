@@ -42,6 +42,12 @@ void SetupTempSensorSerials::init()
     }
     delay(500);
     Serial.begin(115200);
+    #if defined(ASCD_LEONARDO_4X)
+    while (!Serial)
+    {
+        // do nothing
+    };
+    #endif
     configEEPROM.init();
     Serial.println();
     Serial.println(F("---------------------------------------------------------------------------------------------------"));
@@ -161,7 +167,7 @@ void SetupTempSensorSerials::getTempSensorModule()
         {
             if (tempSensorSerialCompleted[i] == false)
             {
-                if (pendingDetection != ((TEMP_SENSENSORS_COUNT) - 1))
+                if (pendingDetection != ((TEMP_SENSENSORS_COUNT)-1))
                 {
                     sensorTemp = sensors.getTempC(tempSensorSerial[i]);
                     Serial.print(F("Sensor "));
@@ -184,7 +190,7 @@ void SetupTempSensorSerials::getTempSensorModule()
                     Serial.println();
                     Serial.println();
                     Serial.print(F("---------------------------------"));
-                    Serial.print(F("Detected Ambient Sensor Completed"));
+                    Serial.print(F("Detected Last Sensor Completed"));
                     Serial.println(F("---------------------------------"));
                     tempSensorSerialCompleted[i] = true;
                     // Got the last one, we are done
@@ -202,8 +208,6 @@ void SetupTempSensorSerials::getTempSensorModule()
         Serial.println();
         Serial.println();
         Serial.println();
-        // Serial.println(F("---------------------------------------------------------------------------------------------------"));
-        // Serial.println(F("Copy and Paste these Addresses into the Arduino Charger / Discharger Sketch"));
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         for (byte i = 0; i < TEMP_SENSENSORS_COUNT; i++)
         {

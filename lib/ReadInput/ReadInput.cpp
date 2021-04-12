@@ -127,10 +127,11 @@ int ReadInput::getInput(const bool arrayPins[])
 int ReadInput::getInput(const byte arrayPin)
 {
     unsigned int batterySampleVoltage = 42; // temp need ADS function to read volatge
-    return batterySampleVoltage / 10; // Calculate and return the Voltage Reading
+    return batterySampleVoltage / 10;       // Calculate and return the Voltage Reading
 }
 #endif
 
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 float ReadInput::readVcc()
 {
     long result;
@@ -155,3 +156,4 @@ float ReadInput::readVcc()
     result |= ADCH << 8;
     return (((config.internalReferenceVoltage / 1000.0) * 1024) / result) / 1023.0; // Calculate Vcc (in Volts) = (((Internal Voltage reference 1.1) * 1024) / result) / 1023
 }
+#endif

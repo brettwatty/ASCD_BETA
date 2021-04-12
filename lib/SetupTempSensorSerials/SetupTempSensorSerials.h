@@ -14,8 +14,8 @@ private:
     byte foundTempSensorsCount;
     float sensorTemp;
     float tempSensorAverageTemp;
-    bool tempSensorSerialCompleted[MODULES_COUNT + 1];
-    byte tempSensorSerialOutput[MODULES_COUNT + 1];
+    bool tempSensorSerialCompleted[TEMP_SENSENSORS_COUNT];
+    byte tempSensorSerialOutput[TEMP_SENSENSORS_COUNT];
     bool detectionComplete = false;
     byte pendingDetection = 0;
 
