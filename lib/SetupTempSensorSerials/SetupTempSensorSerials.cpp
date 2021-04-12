@@ -41,7 +41,7 @@ void SetupTempSensorSerials::init()
         writeOutput.dischargeMosfetOff(module); // Turn off the Discharge Mosfet
     }
     delay(500);
-    Serial.begin(115200);
+    Serial.begin(BAUD_RATE);
     #if defined(ASCD_LEONARDO_4X)
     while (!Serial)
     {

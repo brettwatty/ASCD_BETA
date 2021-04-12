@@ -3,16 +3,16 @@
 #include <SerialWIFI.h>
 
 #if defined(ONLINE)
-	#if defined(ASCD_MEGA_8X)
-		#define ESP8266 Serial1 // Arduino MEGA Hardware Serial1
-	#elif defined(ASCD_NANO_4X)
-		#if defined(SERIAL_PIN_SS)
-			#include <SoftwareSerial.h>
-			SoftwareSerial ESP8266(3, 2); // RX , TX
-		#elif defined(SERIAL_PINS_HS)
-			#define ESP8266 Serial // Arduino Nano Hardware Serial
-		#endif
-	#endif
+#if defined(ASCD_MEGA_8X)
+#define ESP8266 Serial1 // Arduino MEGA Hardware Serial1
+#elif defined(ASCD_NANO_4X)
+#if defined(SERIAL_PIN_SS)
+#include <SoftwareSerial.h>
+SoftwareSerial ESP8266(3, 2); // RX , TX
+#elif defined(SERIAL_PINS_HS)
+#define ESP8266 Serial // Arduino Nano Hardware Serial
+#endif
+#endif
 #endif
 
 SerialWIFI::SerialWIFI()
@@ -23,16 +23,22 @@ void SerialWIFI::init()
 {
 #if defined(ONLINE)
 #if defined(ASCD_MEGA_8X) || defined(SERIAL_PIN_SS) // If Nano uses Hardware Serial it can't print out on the same serial to console
-	//Initialize USB Serial
+//Initialize USB Serial
+#ifndef SERIAL_BEGIN
+#define SERIAL_BEGIN
 	Serial.begin(115200);
+#endif
 	Serial.setTimeout(5);
 #endif
 	//Initialize Software Serial for communication with the ESP8266
 	ESP8266.begin(57600);
 	ESP8266.setTimeout(5);
 #elif defined(OFFLINE)
-	//Initialize USB Serial
+//Initialize USB Serial
+#ifndef SERIAL_BEGIN
+#define SERIAL_BEGIN
 	Serial.begin(115200);
+#endif
 #endif
 }
 
