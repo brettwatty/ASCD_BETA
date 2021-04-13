@@ -2,14 +2,18 @@
 #define VARIABLES_H
 #include <Arduino.h>
 
+// ******************************************************
+// These settings are in the platformio.ini
+
 // #define ASCD_MEGA_8X
-#define ASCD_NANO_4X
+// #define ASCD_NANO_4X
 
 // #define OFFLINE
-#define ONLINE
+// #define ONLINE
 
-#define SERIAL_PIN_SS // SS: Software Serial
+// #define SERIAL_PIN_SS // SS: Software Serial
 // #define SERIAL_PINS_HS  // HS: Hardware Serial
+// ******************************************************
 
 #if defined(ASCD_MEGA_8X)
 // ASCD Mega 8x Settings

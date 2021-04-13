@@ -14,18 +14,19 @@ private:
     byte hours[MODULES_COUNT];
 
     unsigned long mainCycleMillis;
-    unsigned long LCDCycleMillis;
-#if defined(ONLINE)
-    unsigned long serialCycleMillis;
-#endif
-    unsigned long buttonCycleMillis;
 
+#ifndef ASCD_LEONARDO_4X
+    unsigned long LCDCycleMillis;
+    unsigned long buttonCycleMillis;
     byte moduleActiveLCD;
     bool lockActiveLCD;
     byte lockActiveLCDCount;
-    bool serialCycleReady = false;
+#endif
 
-    
+#if defined(ONLINE)
+    unsigned long serialCycleMillis;
+    bool serialCycleReady = false;
+#endif
 
     // Private Class Functions
     Config config;
@@ -35,15 +36,19 @@ public:
     CycleTimer();
     void updateTimer(byte module);
     void clearTimer(byte module);
-    bool buttonCycle();
     bool mainCycle();
+
+#ifndef ASCD_LEONARDO_4X
+    bool buttonCycle();
     void LCDCycle();
-#if defined(ONLINE)
-    void serialCycle();
-#endif
     void setLCDActiveModule();
     byte getLCDActiveModule();
+#endif
+#if defined(ONLINE)
+    void serialCycle();
     bool getSerialCycleReady();
+#endif
+
     byte getSeconds(byte module);
     byte getMinutes(byte module);
     byte getHours(byte module);

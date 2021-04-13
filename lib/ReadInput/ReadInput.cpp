@@ -39,8 +39,24 @@ void ReadInput::init()
     {
         pinMode(chargeLedPin[i], INPUT_PULLUP);
     }
+    Wire.begin();
+    Wire.setClock(400000);
+
+    adsChip[0] = new ADS1015();
+    adsChip[0]->begin(addressBatt, Wire);
+    adsChip[0]->setMode(0);
+    adsChip[0]->setGain(ADS1015_CONFIG_PGA_TWOTHIRDS); // +/- 6.144v
+    adsChip[0]->setSampleRate(ADS1015_CONFIG_RATE_3300HZ);
+
+    adsChip[1] = new ADS1015();
+    adsChip[1]->begin(addressShunt, Wire);
+    adsChip[1]->setMode(0);
+    adsChip[1]->setGain(ADS1015_CONFIG_PGA_16); // PGA_8 +/- 0.512v
+    adsChip[1]->setSampleRate(ADS1015_CONFIG_RATE_3300HZ);
 #endif
 }
+
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 
 int ReadInput::batteryVoltage(byte module)
 {
@@ -52,25 +68,30 @@ int ReadInput::batteryVoltageDrop(byte module)
     return getInput(batteryVoltageDropPin[module]);
 }
 
-int ReadInput::chargeLedVoltage(byte module)
+#elif defined(ASCD_LEONARDO_4X)
+
+int ReadInput::batteryVoltage(byte module)
 {
-    return getInput(chargeLedPin[module]);
+    return getInput(0, batteryVoltagePin[module]);
 }
+
+int ReadInput::batteryVoltageDrop(byte module)
+{
+    return getInput(1, batteryVoltageDropPin[module]);
+}
+
+#endif
 
 bool ReadInput::chargeLed(byte module)
 {
-#if defined(ASCD_MEGA_8X)
+#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X))
     // --------------------------------------------------------------------------------------------------
-    // ASCD Mega 8x
+    // ASCD Mega 8x and ASCD Leonardo 4x TP4056
     return (digitalRead(chargeLedPin[module]) == HIGH) ? true : false;
 #elif defined(ASCD_NANO_4X)
     // --------------------------------------------------------------------------------------------------
     // ASCD Nano 4x
     return (getInput(chargeLedPin[module]) >= config.chargeLedPinMidVoltage[module]) ? true : false;
-#elif defined(ASCD_LEONARDO_4X)
-    // --------------------------------------------------------------------------------------------------
-    // ASCD Leonardo 4x
-    return true; // temp placement
 #endif
 }
 
@@ -124,10 +145,26 @@ int ReadInput::getInput(const bool arrayPins[])
     return batterySampleVoltage / 10; // Calculate and return the Voltage Reading
 }
 #elif defined(ASCD_LEONARDO_4X)
-int ReadInput::getInput(const byte arrayPin)
+int ReadInput::getInput(const byte adcChip, const byte arrayPin)
 {
-    unsigned int batterySampleVoltage = 42; // temp need ADS function to read volatge
-    return batterySampleVoltage / 10;       // Calculate and return the Voltage Reading
+    // Possible use int instead of float below
+    float adcReading = adsChip[adcChip]->getSingleEnded(arrayPin);
+    // Quick fix for noise ( hw ver.1 has no filter caps @ ADC input )
+    if ((adcReading <= 3) || (adcReading >= 4093))
+    {
+        adcReading = 0;
+    }
+    // Multiply value with on the gain multiplier
+    if (adcChip == 0)
+    {
+        adcReading *= 3.0F;
+    }
+    else if (adcChip == 1)
+    {
+        adcReading *= 0.125F;
+    }
+
+    return adcReading; // Calculate and return the Voltage Reading
 }
 #endif
 

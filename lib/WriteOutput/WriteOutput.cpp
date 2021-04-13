@@ -1,15 +1,13 @@
 // #include <Config.h>
 #include <WriteOutput.h>
 
-
-
 WriteOutput::WriteOutput()
 {
 }
 
 void WriteOutput::init()
 {
-#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X)) 
+#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X))
     // --------------------------------------------------------------------------------------------------
     // ASCD Mega 8x
 
@@ -30,17 +28,19 @@ void WriteOutput::init()
     pinMode(dataPin, OUTPUT);
     digitalWrite(latchPin, LOW);
 
-    // FAN
-    pinMode(FAN, OUTPUT);
-    digitalWrite(FAN, LOW);
-
     // Set all pins to LOW
     for (byte i = 0; i < MODULES_COUNT; i++)
     {
         chargeMosfetOff(i);
         dischargeMosfetOff(i);
-    } 
+    }
 #endif
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
+    // FAN
+    pinMode(FAN, OUTPUT);
+    digitalWrite(FAN, HIGH);
+#endif
+
 }
 
 void WriteOutput::chargeMosfetOn(byte module)
@@ -65,8 +65,8 @@ void WriteOutput::dischargeMosfetOff(byte module)
 
 void WriteOutput::setOutput(const byte arrayPin, bool onOff)
 {
-#if defined(ASCD_MEGA_8X)
-    // --------------------------------------------------------------------------------------------------
+#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X))
+    // ---------------------------------------------------
     digitalWrite(arrayPin, (onOff) ? HIGH : LOW);
 #elif defined(ASCD_NANO_4X)
     bitWrite(digitalPinsState, arrayPin, onOff);
@@ -79,7 +79,7 @@ void WriteOutput::setOutput(const byte arrayPin, bool onOff)
 #endif
 }
 
-#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X)) 
+#if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
 void WriteOutput::fanControl(bool onOff)
 {
     digitalWrite(FAN, (onOff) ? HIGH : LOW);

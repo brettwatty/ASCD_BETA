@@ -17,6 +17,10 @@
 #include <SerialWIFI.h>
 #endif
 
+#if defined(SERIAL_OUTPUT)
+#include <OutputSerial.h>
+#endif
+
 #include <WriteOutput.h>
 #include <CycleTimer.h>
 #include <Temperature.h>
@@ -54,9 +58,13 @@ private:
 #endif
 
 // Private Class Functions
+#if defined(SERIAL_OUTPUT)
+    OutputSerial outputSerial;
+#endif
+
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-        OutputLCD outputLCD;
-        InputDevices inputDevices;
+    OutputLCD outputLCD;
+    InputDevices inputDevices;
 #endif
 
 #if defined(ASCD_NANO_4X)

@@ -36,16 +36,21 @@ byte CycleTimer::getHours(byte module)
     return hours[module];
 }
 
+#ifndef ASCD_LEONARDO_4X
 byte CycleTimer::getLCDActiveModule()
 {
     return moduleActiveLCD;
 }
+#endif
 
+#if defined(ONLINE)
 bool CycleTimer::getSerialCycleReady()
 {
     return serialCycleReady;
 }
+#endif
 
+#ifndef ASCD_LEONARDO_4X
 void CycleTimer::setLCDActiveModule()
 {
     if (lockActiveLCD)
@@ -62,10 +67,11 @@ void CycleTimer::setLCDActiveModule()
     }
     lockActiveLCD = true;
 }
+#endif
 
+#ifndef ASCD_LEONARDO_4X
 void CycleTimer::LCDCycle()
 {
-
     if ((millis() - LCDCycleMillis) >= (config.screenTime * 1000))
     {
         LCDCycleMillis = millis();
@@ -95,7 +101,9 @@ void CycleTimer::LCDCycle()
     }
     // moduleActiveLCD = 3; // override to lock screen for testing
 }
+#endif
 
+#ifndef ASCD_LEONARDO_4X
 bool CycleTimer::buttonCycle()
 {
     if ((millis() - buttonCycleMillis) >= 5)
@@ -108,6 +116,7 @@ bool CycleTimer::buttonCycle()
         return false;
     }
 }
+#endif
 
 bool CycleTimer::mainCycle()
 {

@@ -49,18 +49,25 @@ private:
     int getInput(const bool arrayPins[]);
 #elif defined(ASCD_LEONARDO_4X)
 
+    const uint8_t addressBatt = 0x48;
+    const uint8_t addressShunt = 0x49;
 
+    ADS1015 *adsChip[2];
 
-    const byte batteryVoltagePin[MODULES_COUNT] = {0, 1, 2, 3};
-    const byte batteryVoltageDropPin[MODULES_COUNT] = {0, 1, 2, 3};
+    const byte batteryVoltagePin[MODULES_COUNT] = {3, 2, 0, 1};
+    const byte batteryVoltageDropPin[MODULES_COUNT] = {3, 2, 1, 0};
     const byte chargeLedPin[MODULES_COUNT] = {13, 10, 8, 4};
 
     // Private Class Functions
-    int getInput(const byte arrayPin);
+    int getInput(const byte adcChip, const byte arrayPin);
 #endif
 
     // Private Class Functions
+
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     float readVcc();
+#endif
+
     ConfigEEPROM configEEPROM;
     Config config;
 
@@ -70,7 +77,6 @@ public:
     void init();
     int batteryVoltage(byte module);
     int batteryVoltageDrop(byte module);
-    int chargeLedVoltage(byte module);
     bool chargeLed(byte module);
 };
 #endif

@@ -2,7 +2,6 @@
 #define WRITE_OUTPUT_H
 
 #include <Config.h>
-
 #include <Arduino.h>
 
 class WriteOutput
@@ -35,11 +34,11 @@ private:
     // ASCD Leonardo 4x
     // Pin Definitions
     // ********* Need to add LED pins
-    const byte chargeMosfetPins[MODULES_COUNT] = {14, 5, 9, 6};
-    const byte dischargeMosfetPins[MODULES_COUNT] = {19, 18, 17, 16};
+    const byte chargeMosfetPins[MODULES_COUNT] = {A0, 5, 9, 6};
+    const byte dischargeMosfetPins[MODULES_COUNT] = {A5, A4, A3, A2};
 
     // Fan pin 15 Digital
-    const byte FAN = 15; // A1
+    const byte FAN = A1; // A1
 #endif
     // Private Class Functions
     void setOutput(const byte arrayPin, bool onOff);

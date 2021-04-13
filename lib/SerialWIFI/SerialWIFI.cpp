@@ -22,23 +22,23 @@ SerialWIFI::SerialWIFI()
 void SerialWIFI::init()
 {
 #if defined(ONLINE)
-#if defined(ASCD_MEGA_8X) || defined(SERIAL_PIN_SS) // If Nano uses Hardware Serial it can't print out on the same serial to console
-//Initialize USB Serial
-#ifndef SERIAL_BEGIN
-#define SERIAL_BEGIN
-	Serial.begin(115200);
-#endif
-	Serial.setTimeout(5);
-#endif
+	#if defined(ASCD_MEGA_8X) || defined(SERIAL_PIN_SS) // If Nano uses Hardware Serial it can't print out on the same serial to console
+	//Initialize USB Serial
+	#ifndef SERIAL_BEGIN
+		#define SERIAL_BEGIN
+			Serial.begin(BAUD_RATE);
+	#endif
+		Serial.setTimeout(5);
+	#endif
 	//Initialize Software Serial for communication with the ESP8266
-	ESP8266.begin(57600);
+	ESP8266.begin(BAUD_RATE_SS);
 	ESP8266.setTimeout(5);
-#elif defined(OFFLINE)
-//Initialize USB Serial
-#ifndef SERIAL_BEGIN
-#define SERIAL_BEGIN
-	Serial.begin(115200);
-#endif
+#else
+	//Initialize USB Serial
+	#ifndef SERIAL_BEGIN
+		#define SERIAL_BEGIN
+			Serial.begin(BAUD_RATE);
+	#endif
 #endif
 }
 
