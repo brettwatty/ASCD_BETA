@@ -1,7 +1,5 @@
 #include <ClientWIFI.h>
 
-// #include <Config.h>
-
 ClientWIFI::ClientWIFI()
 {
 }
@@ -9,7 +7,7 @@ ClientWIFI::ClientWIFI()
 void ClientWIFI::init()
 {
     delay(5000);
-    Serial.begin(57600);
+    Serial.begin(BAUD_RATE_ESP);
     Serial.setTimeout(5);
     WiFi.begin(config.ssid, config.password);
     while (WiFi.status() != WL_CONNECTED)

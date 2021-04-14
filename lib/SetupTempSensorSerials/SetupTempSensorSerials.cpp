@@ -2,19 +2,14 @@
 
 // #define TEMPERATURE_PRECISION 9
 #if defined(ASCD_MEGA_8X)
-#define TEMP_SENSENSORS_COUNT 9
-#define AMBIENT_TEMP_SENSOR
 #if defined(MEGA_1X)
 #define ONE_WIRE_BUS 2 // Pin 2 Temperature Sensors - ASCD MEGA PCB Version 1.1
 #elif defined(MEGA_2X)
 #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD MEGA PCB Version 2.0+
 #endif
 #elif defined(ASCD_NANO_4X)
-#define TEMP_SENSENSORS_COUNT 5
-#define AMBIENT_TEMP_SENSOR
 #define ONE_WIRE_BUS 4 // Pin 4 Temperature Sensors - ASCD NANO All Versions
 #elif defined(ASCD_LEONARDO_4X)
-#define TEMP_SENSENSORS_COUNT 4
 #define ONE_WIRE_BUS 12 // Pin 12 Temperature Sensors - ASCD LEONARDO 4X
 #endif
 

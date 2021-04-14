@@ -69,7 +69,7 @@ void Cycle::cycleRun()
         }
     }
 #endif
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     cycleTimer.LCDCycle();
 #endif
 #if defined(ONLINE)
@@ -301,7 +301,7 @@ void Cycle::processFault(byte module)
 void Cycle::batteryCheck(byte module)
 {
     batteryVoltage = readInput.batteryVoltage(module);
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     if (cycleTimer.getLCDActiveModule() == module)
     {
         outputLCD.batteryCheckLCD(module, batteryVoltage);
@@ -323,7 +323,7 @@ void Cycle::batteryCheck(byte module)
 void Cycle::batteryBarcode(byte module)
 {
     batteryVoltage = readInput.batteryVoltage(module);
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     if (cycleTimer.getLCDActiveModule() == module)
     {
         outputLCD.batteryBarcodeLCD(module, batteryVoltage);
@@ -367,7 +367,7 @@ void Cycle::batteryCharge(byte module, bool chargeRecharge)
 #endif
         }
     }
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     if (cycleTimer.getLCDActiveModule() == module)
     {
         outputLCD.batteryChargeLCD(module, chargeRecharge, batteryVoltage, batteryInitialVoltage[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
@@ -396,7 +396,7 @@ void Cycle::milliOhmsCycle(byte module)
         tempMilliOhms = (((batteryVoltage - batteryShuntVoltage) / (batteryShuntVoltage / config.shuntResistor[module]))) + config.offsetMilliOhms; // The Drain-Source On-State Resistance of the Discharge Mosfet
         if (tempMilliOhms > 1000)                                                                                                                   // Max 3 digits on LCD
             tempMilliOhms = 999;
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
         if (cycleTimer.getLCDActiveModule() == module)
         {
             outputLCD.milliOhmsLCD(module, tempMilliOhms);
@@ -421,7 +421,7 @@ void Cycle::milliOhmsCycle(byte module)
 void Cycle::restCycle(byte module)
 {
     batteryVoltage = readInput.batteryVoltage(module); // Get Battery Voltage
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     if (cycleTimer.getLCDActiveModule() == module)
     {
         outputLCD.batteryRestLCD(module, batteryVoltage, cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
@@ -461,7 +461,7 @@ void Cycle::dischargeCycle(byte module)
         }
         dischargeMilliamps[module] = dischargeMilliamps[module] + ((((dischargeAmps / 1000.0) * dischargeMillisTime) / 3600));
         dischargeMilliSecondsPrevious[module] = millis();
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
         if (cycleTimer.getLCDActiveModule() == module)
         {
             outputLCD.batteryDischargeLCD(module, batteryVoltage, dischargeAmps, dischargeMilliamps[module], temperature.getCurrentTemp(module), cycleTimer.getHours(module), cycleTimer.getMinutes(module), cycleTimer.getSeconds(module));
@@ -497,7 +497,7 @@ void Cycle::dischargeCycle(byte module)
 void Cycle::completeCycle(byte module)
 {
     batteryVoltage = readInput.batteryVoltage(module);
-#ifndef ASCD_LEONARDO_4X
+#if defined(LCD_OUTPUT)
     if (cycleTimer.getLCDActiveModule() == module)
     {
         outputLCD.completeLCD(module, faultCode[module], milliOhms[module], dischargeMilliamps[module], batteryVoltage);

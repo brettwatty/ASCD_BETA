@@ -78,5 +78,8 @@ public:
     int batteryVoltage(byte module);
     int batteryVoltageDrop(byte module);
     bool chargeLed(byte module);
+#if (defined(ASCD_NANO_4X) && defined(SETUP_CHARGE_LED_MID_VOLTAGE))
+    int chargeLedVoltage(byte module);
+#endif
 };
 #endif

@@ -31,7 +31,7 @@ void SerialWIFI::init()
 		Serial.setTimeout(5);
 	#endif
 	//Initialize Software Serial for communication with the ESP8266
-	ESP8266.begin(BAUD_RATE_SS);
+	ESP8266.begin(BAUD_RATE_ESP); // Needs reviewing
 	ESP8266.setTimeout(5);
 #else
 	//Initialize USB Serial

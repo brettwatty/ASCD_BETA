@@ -56,6 +56,13 @@ void ReadInput::init()
 #endif
 }
 
+#if (defined(ASCD_NANO_4X) && defined(SETUP_CHARGE_LED_MID_VOLTAGE))
+int ReadInput::chargeLedVoltage(byte module)
+{
+    return getInput(chargeLedPin[module]);
+}
+#endif
+
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 
 int ReadInput::batteryVoltage(byte module)
