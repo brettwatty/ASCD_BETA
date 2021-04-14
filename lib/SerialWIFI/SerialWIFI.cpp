@@ -3,7 +3,7 @@
 #include <SerialWIFI.h>
 
 #if defined(ONLINE)
-#if defined(ASCD_MEGA_8X)
+#if (defined(ASCD_MEGA_8X) || defined(ASCD_LEONARDO_4X))
 #define ESP8266 Serial1 // Arduino MEGA Hardware Serial1
 #elif defined(ASCD_NANO_4X)
 #if defined(SERIAL_PIN_SS)

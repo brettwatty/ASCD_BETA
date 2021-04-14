@@ -38,7 +38,7 @@ String ClientWIFI::updateUnitData()
 {
     if (client.connect(config.server, 80))
     {
-        client.print("GET /update_unit_data_dev.php?");
+        client.print("GET /update_unit_data.php?");
         client.print("UH=");
         client.print(config.userHash);
         client.print("&");

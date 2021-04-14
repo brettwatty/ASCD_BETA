@@ -21,10 +21,10 @@ void Cycle::init()
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     inputDevices.init();
 #endif
-    temperature.init();
-#ifdef ONLINE
+#if defined(ONLINE)
     serialWIFI.init();
 #endif
+    temperature.init();
     configEEPROM.init();
     readInput.init();
 
@@ -44,10 +44,13 @@ void Cycle::init()
         readInput.batteryVoltageDrop(module);
         temperature.getTemperature(module, true);
     }
-#ifndef ASCD_LEONARDO_4X
+
+#if defined(AMBIENT_TEMP_SENSOR)
     temperature.getAmbientTemperature();
 #endif
-    delay(2000);
+#if defined(ASCD_NANO_4X)
+    delay(2000); // ASCD_NANO_4X to let voltages settle
+#endif
 #if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     writeOutput.fanControl(false); // Turn off fan on boot
 #endif
@@ -95,7 +98,7 @@ void Cycle::mainCycle()
 #endif
 #if defined(ONLINE)
     serialWIFI.clearSerialSendString();
-#ifndef ASCD_LEONARDO_4X
+#if defined(AMBIENT_TEMP_SENSOR)
     serialWIFI.ambientTemperatureSerial(temperature.getAmbientTemperature());
 #endif
 #endif
@@ -106,11 +109,11 @@ void Cycle::mainCycle()
         case 0: // Check Battery Voltage
             batteryCheck(module);
             break;
-        case 1: // Battery Barcode
 #if defined(ONLINE)
+        case 1: // Battery Barcode
             batteryBarcode(module);
-#endif
             break;
+#endif
         case 2: // Charge Battery
             cycleTimer.updateTimer(module);
             if (temperature.processTemperature(module) == 2)

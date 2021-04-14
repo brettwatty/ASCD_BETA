@@ -10,7 +10,7 @@ class SerialWIFI
 private:
 #if defined(ASCD_MEGA_8X)
     char serialSendString[1024];
-#elif defined(ASCD_NANO_4X)
+#elif (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X))
     char serialSendString[400];
 #endif
 

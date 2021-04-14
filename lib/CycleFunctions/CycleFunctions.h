@@ -51,7 +51,8 @@ private:
     // Fan Variables
     bool fanOn = false;
 #endif
-#ifdef ONLINE
+
+#if defined(ONLINE)
     // Serial Variables
     bool readSerialResponse = false;
     byte countSerialSend = 0;
@@ -62,8 +63,11 @@ private:
     OutputSerial outputSerial;
 #endif
 
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+#if defined(LCD_OUTPUT)
     OutputLCD outputLCD;
+#endif
+
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     InputDevices inputDevices;
 #endif
 
