@@ -226,7 +226,10 @@ void SetupTempSensorSerials::getTempSensorModule()
             // Copy to config.dallasSerials -> Config.h
             memcpy(config.dallasSerials[i], tempSensorSerial[tempSensorSerialOutput[i]], 8);
         }
-        configEEPROM.writeConfigEEPROM();
+        if(configEEPROM.checkEEPROMEmpty()){
+            configEEPROM.init();
+        }
+        configEEPROM.setDallasSerials();
 
         Serial.println(F("---------------------------------------------------------------------------------------------------"));
         Serial.println(F("Temperature Sensor Serials Saved to EEPROM"));

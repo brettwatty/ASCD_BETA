@@ -4,6 +4,7 @@
 #include <Config.h>
 
 #include <Arduino.h>
+#include <avr/wdt.h>
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
 #include <OutputLCD.h>
 #include <InputDevices.h>
@@ -95,6 +96,7 @@ private:
     void dischargeCycle(byte module);
     void restCycle(byte module);
     void completeCycle(byte module);
+    void resetASCD();
 
 public:
     // Public Class Functions

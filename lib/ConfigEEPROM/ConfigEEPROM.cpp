@@ -7,284 +7,545 @@ ConfigEEPROM::ConfigEEPROM()
 
 void ConfigEEPROM::init()
 {
-    // clearEEPROM();
-    // clearEEPROMConfig();
-    setAddressSize();
-    checkEEPROMEmpty();
+    // EEPROM.write(0, 255); // Writes Address 0 = 255 to notify code that EEPROM is empty - Use to clear EEPROM
     Serial.println(F("--------------------------------------------------------"));
-    if (emptyEEPROM == false)
+    if (checkEEPROMEmpty() == false)
     {
-        // loadConfigEEPROM(); // EEPROM is not EMPTY -> Load Values into config Struct
         Serial.println(F("Config Loaded from EEPROM"));
+        getPutEEPROM(0, true, true, false);
     }
     else
     {
-        // writeCustomConfigEEPROM();
         Serial.println(F("EEPROM Empty - Using values from Config.h"));
+        getPutEEPROM(0, true, false, false);
     }
     Serial.println(F("--------------------------------------------------------"));
 }
 
-void ConfigEEPROM::checkEEPROMEmpty()
+bool ConfigEEPROM::checkEEPROMEmpty()
 {
-    byte countEmptyAddresses = 0;
-    byte valueEEPROM;
-    for (byte i = 0; i < addressCountEEPROM; i++)
-    {
-        valueEEPROM = EEPROM.read(i);
-        if (valueEEPROM == 255)
-        {
-            countEmptyAddresses++;
-        }
-    }
-    if (addressCountEEPROM == countEmptyAddresses)
+    getPutEEPROM(0, false, true, false);
+    if (tempDefaultValueEEPROM != config.defaultValueEEPROM) // Get defaultValueEEPROM from EEPROM
     {
         // EEPROM is EMPTY
-        emptyEEPROM = true;
+        return true;
     }
     else
     {
         // EEPROM is NOT EMPTY
-        emptyEEPROM = false;
+        return false;
     }
 }
 
-bool ConfigEEPROM::getEEPROMEmpty()
-{
-    return emptyEEPROM;
-}
+// Multiple return Function getPutEEPROM
+// -------------------------------------
+// inputPointer - is a reference for each Config variable e.g. getPutEEPROM(10, false, true, false); - gets addressEEPROM (tempMaxThreshold) copies to config.tempMaxThreshold
+// runAll - will execute all inputPointers if TRUE. Set False for single inputPointer
+// getEEPROM - if TRUE EEPROM.get is used a.k.a read the EEPROM. If FALSE EEPROM.put is used a.k.a write
+// addressSizeEEPROM - if TRUE, Function returns addressEEPROM total size - set inputPointer to 255 e.g. getPutEEPROM(255, false, true, true);
 
-void ConfigEEPROM::setAddressSize()
+int ConfigEEPROM::getPutEEPROM(byte inputPointer, bool runAll, bool getEEPROM, bool addressSizeEEPROM)
 {
-    addressCountEEPROM = 0;
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-    addressCountEEPROM += sizeof(config.useReferenceVoltage);
-    addressCountEEPROM += sizeof(config.referenceVoltage);
-    addressCountEEPROM += sizeof(config.internalReferenceVoltage);
-#endif
-    addressCountEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
-    addressCountEEPROM += sizeof(config.storageChargeVoltage);
-    addressCountEEPROM += sizeof(config.batteryVoltageLeak);
-    addressCountEEPROM += sizeof(config.lowMilliAmps);
-    addressCountEEPROM += sizeof(config.highMilliOhms);
-    addressCountEEPROM += sizeof(config.offsetMilliOhms);
-    addressCountEEPROM += sizeof(config.restTimeMinutes);
-    addressCountEEPROM += sizeof(config.chargingTimeout);
-    addressCountEEPROM += sizeof(config.tempThreshold);
-    addressCountEEPROM += sizeof(config.tempMaxThreshold);
-    addressCountEEPROM += sizeof(config.rechargeCycle);
-    addressCountEEPROM += sizeof(config.screenTime);
-    addressCountEEPROM += sizeof(config.shuntResistor);
-#if defined(ASCD_NANO_4X)
-    addressCountEEPROM += sizeof(config.chargeLedPinMidVoltage);
-#endif
-    addressCountEEPROM += sizeof(config.dallasSerials);
-}
-void ConfigEEPROM::clearCustomEEPROM()
-{
-    byte configAddressCountEEPROM = 0;
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-    configAddressCountEEPROM += sizeof(config.useReferenceVoltage);
-    configAddressCountEEPROM += sizeof(config.referenceVoltage);
-    configAddressCountEEPROM += sizeof(config.internalReferenceVoltage);
-#endif
-    configAddressCountEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
-    configAddressCountEEPROM += sizeof(config.storageChargeVoltage);
-    configAddressCountEEPROM += sizeof(config.batteryVoltageLeak);
-    configAddressCountEEPROM += sizeof(config.lowMilliAmps);
-    configAddressCountEEPROM += sizeof(config.highMilliOhms);
-    configAddressCountEEPROM += sizeof(config.offsetMilliOhms);
-    configAddressCountEEPROM += sizeof(config.restTimeMinutes);
-    configAddressCountEEPROM += sizeof(config.chargingTimeout);
-    configAddressCountEEPROM += sizeof(config.tempThreshold);
-    configAddressCountEEPROM += sizeof(config.tempMaxThreshold);
-    configAddressCountEEPROM += sizeof(config.rechargeCycle);
-    configAddressCountEEPROM += sizeof(config.screenTime);
-    configAddressCountEEPROM += sizeof(config.shuntResistor);
-
-    for (byte i = 0; i < configAddressCountEEPROM; i++)
+    int addressEEPROM = 0;
+    if (inputPointer == 0 || runAll)
     {
-        EEPROM.update(i, 255);
+        if (getEEPROM)
+        {
+            // Serial.print(F("#0 "));
+            tempDefaultValueEEPROM = EEPROM.read(0);
+            // Serial.println(tempDefaultValueEEPROM);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.defaultValueEEPROM);
+        }
     }
-}
-
-void ConfigEEPROM::writeCustomConfigEEPROM()
-{
-    addressEEPROM = 0;
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-    EEPROM.put(addressEEPROM, config.useReferenceVoltage);
-    addressEEPROM += sizeof(config.useReferenceVoltage);
-
-    EEPROM.put(addressEEPROM, config.referenceVoltage);
-    addressEEPROM += sizeof(config.referenceVoltage);
-
-    EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
-    addressEEPROM += sizeof(config.internalReferenceVoltage);
-#endif
-    EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
-    addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
-
-    EEPROM.put(addressEEPROM, config.storageChargeVoltage);
-    addressEEPROM += sizeof(config.storageChargeVoltage);
-
-    EEPROM.put(addressEEPROM, config.batteryVoltageLeak);
-    addressEEPROM += sizeof(config.batteryVoltageLeak);
-
-    EEPROM.put(addressEEPROM, config.lowMilliAmps);
-    addressEEPROM += sizeof(config.lowMilliAmps);
-
-    EEPROM.put(addressEEPROM, config.highMilliOhms);
-    addressEEPROM += sizeof(config.highMilliOhms);
-
-    EEPROM.put(addressEEPROM, config.offsetMilliOhms);
-    addressEEPROM += sizeof(config.offsetMilliOhms);
-
-    EEPROM.put(addressEEPROM, config.restTimeMinutes);
-    addressEEPROM += sizeof(config.restTimeMinutes);
-
-    EEPROM.put(addressEEPROM, config.chargingTimeout);
-    addressEEPROM += sizeof(config.chargingTimeout);
-
-    EEPROM.put(addressEEPROM, config.tempThreshold);
-    addressEEPROM += sizeof(config.tempThreshold);
-
-    EEPROM.put(addressEEPROM, config.tempMaxThreshold);
-    addressEEPROM += sizeof(config.tempMaxThreshold);
-
-    EEPROM.put(addressEEPROM, config.rechargeCycle);
-    addressEEPROM += sizeof(config.rechargeCycle);
-
-    EEPROM.put(addressEEPROM, config.screenTime);
-    addressEEPROM += sizeof(config.screenTime);
-
-    EEPROM.put(addressEEPROM, config.shuntResistor);
-    addressEEPROM += sizeof(config.shuntResistor);
-
-    emptyEEPROM = false;
-}
-
-void ConfigEEPROM::writeConfigEEPROM()
-{
-    addressEEPROM = 0;
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-    EEPROM.put(addressEEPROM, config.useReferenceVoltage);
-    addressEEPROM += sizeof(config.useReferenceVoltage);
-
-    EEPROM.put(addressEEPROM, config.referenceVoltage);
-    addressEEPROM += sizeof(config.referenceVoltage);
-
-    EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
-    addressEEPROM += sizeof(config.internalReferenceVoltage);
-#endif
-    EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
-    addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
-
-    EEPROM.put(addressEEPROM, config.storageChargeVoltage);
-    addressEEPROM += sizeof(config.storageChargeVoltage);
-
-    EEPROM.put(addressEEPROM, config.batteryVoltageLeak);
-    addressEEPROM += sizeof(config.batteryVoltageLeak);
-
-    EEPROM.put(addressEEPROM, config.lowMilliAmps);
-    addressEEPROM += sizeof(config.lowMilliAmps);
-
-    EEPROM.put(addressEEPROM, config.highMilliOhms);
-    addressEEPROM += sizeof(config.highMilliOhms);
-
-    EEPROM.put(addressEEPROM, config.offsetMilliOhms);
-    addressEEPROM += sizeof(config.offsetMilliOhms);
-
-    EEPROM.put(addressEEPROM, config.restTimeMinutes);
-    addressEEPROM += sizeof(config.restTimeMinutes);
-
-    EEPROM.put(addressEEPROM, config.chargingTimeout);
-    addressEEPROM += sizeof(config.chargingTimeout);
-
-    EEPROM.put(addressEEPROM, config.tempThreshold);
-    addressEEPROM += sizeof(config.tempThreshold);
-
-    EEPROM.put(addressEEPROM, config.tempMaxThreshold);
-    addressEEPROM += sizeof(config.tempMaxThreshold);
-
-    EEPROM.put(addressEEPROM, config.rechargeCycle);
-    addressEEPROM += sizeof(config.rechargeCycle);
-
-    EEPROM.put(addressEEPROM, config.screenTime);
-    addressEEPROM += sizeof(config.screenTime);
-
-    EEPROM.put(addressEEPROM, config.shuntResistor);
-    addressEEPROM += sizeof(config.shuntResistor);
-#if defined(ASCD_NANO_4X)
-    EEPROM.put(addressEEPROM, config.chargeLedPinMidVoltage);
-    addressEEPROM += sizeof(config.chargeLedPinMidVoltage);
-#endif
-    EEPROM.put(addressEEPROM, config.dallasSerials);
-
-    emptyEEPROM = false;
-}
-
-void ConfigEEPROM::loadConfigEEPROM()
-{
-#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
-    addressEEPROM = 0;
-    EEPROM.get(addressEEPROM, config.useReferenceVoltage);
-    addressEEPROM += sizeof(config.useReferenceVoltage);
-
-    EEPROM.get(addressEEPROM, config.referenceVoltage);
-    addressEEPROM += sizeof(config.referenceVoltage);
-
-    EEPROM.get(addressEEPROM, config.internalReferenceVoltage);
-    addressEEPROM += sizeof(config.internalReferenceVoltage);
-#endif
-    EEPROM.get(addressEEPROM, config.defaultBatteryCutOffVoltage);
-    addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
-
-    EEPROM.get(addressEEPROM, config.storageChargeVoltage);
-    addressEEPROM += sizeof(config.storageChargeVoltage);
-
-    EEPROM.get(addressEEPROM, config.batteryVoltageLeak);
-    addressEEPROM += sizeof(config.batteryVoltageLeak);
-
-    EEPROM.get(addressEEPROM, config.lowMilliAmps);
-    addressEEPROM += sizeof(config.lowMilliAmps);
-
-    EEPROM.get(addressEEPROM, config.highMilliOhms);
-    addressEEPROM += sizeof(config.highMilliOhms);
-
-    EEPROM.get(addressEEPROM, config.offsetMilliOhms);
-    addressEEPROM += sizeof(config.offsetMilliOhms);
-
-    EEPROM.get(addressEEPROM, config.restTimeMinutes);
-    addressEEPROM += sizeof(config.restTimeMinutes);
-
-    EEPROM.get(addressEEPROM, config.chargingTimeout);
-    addressEEPROM += sizeof(config.chargingTimeout);
-
-    EEPROM.get(addressEEPROM, config.tempThreshold);
-    addressEEPROM += sizeof(config.tempThreshold);
-
-    EEPROM.get(addressEEPROM, config.tempMaxThreshold);
-    addressEEPROM += sizeof(config.tempMaxThreshold);
-
-    EEPROM.get(addressEEPROM, config.rechargeCycle);
-    addressEEPROM += sizeof(config.rechargeCycle);
-
-    EEPROM.get(addressEEPROM, config.screenTime);
-    addressEEPROM += sizeof(config.screenTime);
-
-    EEPROM.get(addressEEPROM, config.shuntResistor);
-    addressEEPROM += sizeof(config.shuntResistor);
-#if defined(ASCD_NANO_4X)
-    EEPROM.get(addressEEPROM, config.chargeLedPinMidVoltage);
-    addressEEPROM += sizeof(config.chargeLedPinMidVoltage);
-#endif
-    EEPROM.get(addressEEPROM, config.dallasSerials);
-}
-
-void ConfigEEPROM::clearEEPROM()
-{
-    for (unsigned int i = 0; i < EEPROM.length(); i++)
+    addressEEPROM += sizeof(config.defaultValueEEPROM);
+    if (inputPointer == 1 || runAll)
     {
-        EEPROM.update(i, 255);
+        if (getEEPROM)
+        {
+            // Serial.print(F("#1 "));
+            EEPROM.get(addressEEPROM, config.defaultBatteryCutOffVoltage);
+            // Serial.println(config.defaultBatteryCutOffVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.defaultBatteryCutOffVoltage);
+        }
     }
+    addressEEPROM += sizeof(config.defaultBatteryCutOffVoltage);
+    if (inputPointer == 2 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#2 "));
+            EEPROM.get(addressEEPROM, config.storageChargeVoltage);
+            // Serial.println(config.storageChargeVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.storageChargeVoltage);
+        }
+    }
+    addressEEPROM += sizeof(config.storageChargeVoltage);
+    if (inputPointer == 3 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#3 "));
+            EEPROM.get(addressEEPROM, config.batteryVoltageLeak);
+            // Serial.println(config.batteryVoltageLeak);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.batteryVoltageLeak);
+        }
+    }
+    addressEEPROM += sizeof(config.batteryVoltageLeak);
+    if (inputPointer == 4 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#4 "));
+            EEPROM.get(addressEEPROM, config.lowMilliAmps);
+            // Serial.println(config.lowMilliAmps);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.lowMilliAmps);
+        }
+    }
+    addressEEPROM += sizeof(config.lowMilliAmps);
+    if (inputPointer == 5 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#5 "));
+            EEPROM.get(addressEEPROM, config.highMilliOhms);
+            // Serial.println(config.highMilliOhms);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.highMilliOhms);
+        }
+    }
+    addressEEPROM += sizeof(config.highMilliOhms);
+    if (inputPointer == 6 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#6 "));
+            EEPROM.get(addressEEPROM, config.offsetMilliOhms);
+            // Serial.println(config.offsetMilliOhms);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.offsetMilliOhms);
+        }
+    }
+    addressEEPROM += sizeof(config.offsetMilliOhms);
+    if (inputPointer == 7 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#7 "));
+            EEPROM.get(addressEEPROM, config.restTimeMinutes);
+            // Serial.println(config.restTimeMinutes);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.restTimeMinutes);
+        }
+    }
+    addressEEPROM += sizeof(config.restTimeMinutes);
+    if (inputPointer == 8 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#8 "));
+            EEPROM.get(addressEEPROM, config.chargingTimeout);
+            // Serial.println(config.chargingTimeout);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.chargingTimeout);
+        }
+    }
+    addressEEPROM += sizeof(config.chargingTimeout);
+    if (inputPointer == 9 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#9 "));
+            EEPROM.get(addressEEPROM, config.tempThreshold);
+            // Serial.println(config.tempThreshold);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.tempThreshold);
+        }
+    }
+    addressEEPROM += sizeof(config.tempThreshold);
+    if (inputPointer == 10 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#10 "));
+            EEPROM.get(addressEEPROM, config.tempMaxThreshold);
+            // Serial.println(config.tempMaxThreshold);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.tempMaxThreshold);
+        }
+    }
+    addressEEPROM += sizeof(config.tempMaxThreshold);
+    if (inputPointer == 11 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#11 "));
+            EEPROM.get(addressEEPROM, config.rechargeCycle);
+            // Serial.println(config.rechargeCycle);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.rechargeCycle);
+        }
+    }
+    addressEEPROM += sizeof(config.rechargeCycle);
+    if (inputPointer == 12 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#12 "));
+            EEPROM.get(addressEEPROM, config.screenTime);
+            // Serial.println(config.screenTime);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.screenTime);
+        }
+    }
+    addressEEPROM += sizeof(config.screenTime);
+    if (inputPointer == 13 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#13 "));
+            EEPROM.get(addressEEPROM, config.shuntResistor);
+            // Serial.println(config.shuntResistor[0]);
+            // Serial.println(config.shuntResistor[1]);
+            // Serial.println(config.shuntResistor[2]);
+            // Serial.println(config.shuntResistor[3]);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.shuntResistor);
+        }
+    }
+    addressEEPROM += sizeof(config.shuntResistor);
+    if (inputPointer == 14 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#14 "));
+            EEPROM.get(addressEEPROM, config.dallasSerials);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.dallasSerials);
+        }
+    }
+    addressEEPROM += sizeof(config.dallasSerials);
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+    if (inputPointer == 15 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#15 "));
+            EEPROM.get(addressEEPROM, config.useReferenceVoltage);
+            // Serial.println(config.useReferenceVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.useReferenceVoltage);
+        }
+    }
+    addressEEPROM += sizeof(config.useReferenceVoltage);
+    if (inputPointer == 16 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#16 "));
+            EEPROM.get(addressEEPROM, config.referenceVoltage);
+            // Serial.println(config.referenceVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.referenceVoltage);
+        }
+    }
+#if defined(ASCD_NANO_4X)
+    addressEEPROM += sizeof(config.referenceVoltage);
+    if (inputPointer == 17 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#17 "));
+            EEPROM.get(addressEEPROM, config.internalReferenceVoltage);
+            // Serial.println(config.internalReferenceVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
+        }
+    }
+    addressEEPROM += sizeof(config.internalReferenceVoltage);
+    if (inputPointer == 18 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#18 "));
+            EEPROM.get(addressEEPROM, config.chargeLedPinMidVoltage);
+            // Serial.println(config.chargeLedPinMidVoltage[0]);
+            // Serial.println(config.chargeLedPinMidVoltage[1]);
+            // Serial.println(config.chargeLedPinMidVoltage[2]);
+            // Serial.println(config.chargeLedPinMidVoltage[3]);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.chargeLedPinMidVoltage);
+        }
+    }
+    if (addressSizeEEPROM)
+    {
+
+        addressEEPROM += sizeof(config.chargeLedPinMidVoltage);
+        return addressSizeEEPROM;
+    }
+#else
+    addressEEPROM += sizeof(config.referenceVoltage);
+    if (inputPointer == 17 || runAll)
+    {
+        if (getEEPROM)
+        {
+            // Serial.print(F("#17 "));
+            EEPROM.get(addressEEPROM, config.internalReferenceVoltage);
+            // Serial.println(config.internalReferenceVoltage);
+        }
+        else
+        {
+            EEPROM.put(addressEEPROM, config.internalReferenceVoltage);
+        }
+    }
+    if (addressSizeEEPROM)
+    {
+        addressEEPROM += sizeof(config.internalReferenceVoltage);
+        return addressSizeEEPROM;
+    }
+#endif
+#else
+    if (addressSizeEEPROM)
+    {
+        return addressSizeEEPROM;
+    }
+#endif
 }
+
+void ConfigEEPROM::setDefaultValueEEPROM()
+{
+    getPutEEPROM(0, false, false, false);
+}
+
+void ConfigEEPROM::getDefaultValueEEPROM()
+{
+    getPutEEPROM(0, false, true, false);
+}
+
+void ConfigEEPROM::setDefaultBatteryCutOffVoltage()
+{
+    getPutEEPROM(1, false, false, false);
+}
+
+void ConfigEEPROM::getDefaultBatteryCutOffVoltage()
+{
+    getPutEEPROM(1, false, true, false);
+}
+
+void ConfigEEPROM::setStorageChargeVoltage()
+{
+    getPutEEPROM(2, false, false, false);
+}
+
+void ConfigEEPROM::getStorageChargeVoltage()
+{
+    getPutEEPROM(2, false, true, false);
+}
+
+void ConfigEEPROM::setBatteryVoltageLeak()
+{
+    getPutEEPROM(3, false, false, false);
+}
+
+void ConfigEEPROM::getBatteryVoltageLeak()
+{
+    getPutEEPROM(3, false, true, false);
+}
+
+void ConfigEEPROM::setLowMilliAmps()
+{
+    getPutEEPROM(4, false, false, false);
+}
+
+void ConfigEEPROM::getLowMilliAmps()
+{
+    getPutEEPROM(4, false, true, false);
+}
+
+void ConfigEEPROM::setHighMilliOhms()
+{
+    getPutEEPROM(5, false, false, false);
+}
+
+void ConfigEEPROM::getHighMilliOhms()
+{
+    getPutEEPROM(5, false, true, false);
+}
+
+void ConfigEEPROM::setOffsetMilliOhms()
+{
+    getPutEEPROM(6, false, false, false);
+}
+
+void ConfigEEPROM::getOffsetMilliOhms()
+{
+    getPutEEPROM(6, false, true, false);
+}
+
+void ConfigEEPROM::setRestTimeMinutes()
+{
+    getPutEEPROM(7, false, false, false);
+}
+
+void ConfigEEPROM::getRestTimeMinutes()
+{
+    getPutEEPROM(7, false, true, false);
+}
+
+void ConfigEEPROM::setChargingTimeout()
+{
+    getPutEEPROM(8, false, false, false);
+}
+
+void ConfigEEPROM::getChargingTimeout()
+{
+    getPutEEPROM(8, false, true, false);
+}
+
+void ConfigEEPROM::setTempThreshold()
+{
+    getPutEEPROM(9, false, false, false);
+}
+
+void ConfigEEPROM::getTempThreshold()
+{
+    getPutEEPROM(9, false, true, false);
+}
+
+void ConfigEEPROM::setTempMaxThreshold()
+{
+    getPutEEPROM(10, false, false, false);
+}
+
+void ConfigEEPROM::getTempMaxThreshold()
+{
+    getPutEEPROM(10, false, true, false);
+}
+
+void ConfigEEPROM::setRechargeCycle()
+{
+    getPutEEPROM(11, false, false, false);
+}
+
+void ConfigEEPROM::getRechargeCycle()
+{
+    getPutEEPROM(11, false, true, false);
+}
+
+void ConfigEEPROM::setScreenTime()
+{
+    getPutEEPROM(12, false, false, false);
+}
+
+void ConfigEEPROM::getScreenTime()
+{
+    getPutEEPROM(12, false, true, false);
+}
+
+void ConfigEEPROM::setShuntResistor()
+{
+    getPutEEPROM(13, false, false, false);
+}
+
+void ConfigEEPROM::getShuntResistor()
+{
+    getPutEEPROM(13, false, true, false);
+}
+
+void ConfigEEPROM::setDallasSerials()
+{
+    getPutEEPROM(14, false, false, false);
+}
+
+void ConfigEEPROM::getDallasSerials()
+{
+    getPutEEPROM(14, false, true, false);
+}
+
+#if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
+
+void ConfigEEPROM::setUseReferenceVoltage()
+{
+    getPutEEPROM(15, false, false, false);
+}
+
+void ConfigEEPROM::getUseReferenceVoltage()
+{
+    getPutEEPROM(15, false, true, false);
+}
+
+void ConfigEEPROM::setReferenceVoltage()
+{
+    getPutEEPROM(16, false, false, false);
+}
+
+void ConfigEEPROM::getReferenceVoltage()
+{
+    getPutEEPROM(16, false, true, false);
+}
+
+void ConfigEEPROM::setInternalReferenceVoltage()
+{
+    getPutEEPROM(17, false, false, false);
+}
+
+void ConfigEEPROM::getInternalReferenceVoltage()
+{
+    getPutEEPROM(17, false, true, false);
+}
+
+#if defined(ASCD_NANO_4X)
+
+void ConfigEEPROM::setChargeLedPinMidVoltage()
+{
+    getPutEEPROM(18, false, false, false);
+}
+
+void ConfigEEPROM::getChargeLedPinMidVoltage()
+{
+    getPutEEPROM(18, false, true, false);
+}
+#endif
+#endif

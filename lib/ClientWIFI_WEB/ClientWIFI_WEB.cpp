@@ -1,5 +1,7 @@
 #include <ClientWIFI_WEB.h>
 
+#include "ClientWIFI_WEB_Page.h"
+
 ClientWIFI_WEB::ClientWIFI_WEB()
 {
 }
@@ -9,7 +11,7 @@ void ClientWIFI_WEB::init()
     // -------------------------------------------------
     // Serial
     // delay(5000); // Delay to wait for Arduino to start
-    Serial.begin(57600);
+    Serial.begin(BAUD_RATE_ESP);
     Serial.setTimeout(5);
     Serial.println();
     Serial.println();
@@ -81,6 +83,8 @@ bool ClientWIFI_WEB::connectWIFI()
 
 void ClientWIFI_WEB::modeAP()
 {
+    scanSSID();
+    delay(500);
     WiFi.mode(WIFI_AP);
     WiFi.softAP(SSID);
     IPAddress myIP = WiFi.softAPIP();
@@ -89,6 +93,7 @@ void ClientWIFI_WEB::modeAP()
     Serial.print("AP IP address: ");
     Serial.println(myIP);
     server.on("/", [this] { handleRoot(); });
+    server.on("/getSSID", [this] { handleSSID(); });
     server.begin(80);
     Serial.println("HTTP server started");
 }
@@ -101,6 +106,33 @@ void ClientWIFI_WEB::cycleClientWifi()
 void ClientWIFI_WEB::handleRoot()
 {
     server.send(200, "text/html", mainPage);
+    // server.send(200, "text/html", "hello bretto");
+}
+
+void ClientWIFI_WEB::handleSSID()
+{
+    server.send(200, "text/plane", commaSSID); //Send web page
+}
+
+void ClientWIFI_WEB::scanSSID()
+{
+    Serial.println(F("Searching for WIFI AP's"));
+    WiFi.disconnect();
+    delay(100);
+    WiFi.mode(WIFI_STA);
+    delay(100);
+    byte countSSID = WiFi.scanNetworks();
+    Serial.print(F("Found: "));
+    Serial.print(countSSID);
+    Serial.println(F(" AP(s)"));
+    for (byte i = 0; i < countSSID; ++i)
+    {
+        if (i != 0)
+            commaSSID += ",";
+        commaSSID += WiFi.SSID(i);
+        Serial.println(WiFi.SSID(i));
+    }
+    Serial.println();
 }
 
 void ClientWIFI_WEB::getEEPROM()

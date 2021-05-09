@@ -23,7 +23,7 @@ public:
     Config();
     // Public Variables
 #if (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
-
+    static byte defaultValueEEPROM;
 // ASCD_NANO_4X, ASCD_LEONARDO_4X and ASCD_MEGA_8X - Config Settings
 #if (defined(ASCD_NANO_4X) || defined(ASCD_MEGA_8X))
     static bool useReferenceVoltage;

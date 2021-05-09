@@ -7,7 +7,6 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
-#include "ClientWIFI_WEB_Page.h"
 
 class ClientWIFI_WEB
 {
@@ -17,6 +16,7 @@ private:
     bool emptyEEPROM;
     byte addressEEPROM = 0;
     byte addressCountEEPROM = 0;
+    String commaSSID;
 
     // char wifiSSID[32];
     // char wifiPassword[64];
@@ -29,6 +29,8 @@ private:
     Config config;
     ESP8266WebServer server;
 
+    void scanSSID();
+
 public:
     // Public Class Functions
     ClientWIFI_WEB();
@@ -36,6 +38,8 @@ public:
     void modeAP();
     void cycleClientWifi();
     void handleRoot();
+    void handleSSID();
+    
     void getEEPROM();
     void setEEPROM();
     void setAddressSize();

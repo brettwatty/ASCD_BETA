@@ -21,7 +21,7 @@ void SetupChargeLEDMidVoltage::init()
         readInput.batteryVoltageDrop(module);
     }
     delay(2000);
-    Serial.begin(115200);
+    Serial.begin(BAUD_RATE);
     configEEPROM.init();
     Serial.println();
     Serial.println(F("---------------------------------------------------------------------------------------------------"));
@@ -67,7 +67,8 @@ void SetupChargeLEDMidVoltage::getChargeMidVoltage()
 void SetupChargeLEDMidVoltage::saveToEEPROM()
 {
     memcpy(config.chargeLedPinMidVoltage, chargeLedPinMidVoltageArray, sizeof(chargeLedPinMidVoltageArray));
-    configEEPROM.writeConfigEEPROM();
+    configEEPROM.setChargeLedPinMidVoltage();
+
     Serial.println(F("---------------------------------------------------------------------------------------------------"));
     Serial.println(F("Charge LED Mid Voltage values Saved to EEPROM"));
     Serial.println(F("---------------------------------------------------------------------------------------------------"));

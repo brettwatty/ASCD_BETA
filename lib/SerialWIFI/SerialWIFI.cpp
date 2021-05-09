@@ -22,23 +22,23 @@ SerialWIFI::SerialWIFI()
 void SerialWIFI::init()
 {
 #if defined(ONLINE)
-	#if defined(ASCD_MEGA_8X) || defined(SERIAL_PIN_SS) // If Nano uses Hardware Serial it can't print out on the same serial to console
-	//Initialize USB Serial
-	#ifndef SERIAL_BEGIN
-		#define SERIAL_BEGIN
-			Serial.begin(BAUD_RATE);
-	#endif
-		Serial.setTimeout(5);
-	#endif
+#if defined(ASCD_MEGA_8X) || defined(SERIAL_PIN_SS) // If Nano uses Hardware Serial it can't print out on the same serial to console
+//Initialize USB Serial
+#ifndef SERIAL_BEGIN
+#define SERIAL_BEGIN
+	Serial.begin(BAUD_RATE);
+#endif
+	Serial.setTimeout(5);
+#endif
 	//Initialize Software Serial for communication with the ESP8266
 	ESP8266.begin(BAUD_RATE_ESP); // Needs reviewing
 	ESP8266.setTimeout(5);
 #else
-	//Initialize USB Serial
-	#ifndef SERIAL_BEGIN
-		#define SERIAL_BEGIN
-			Serial.begin(BAUD_RATE);
-	#endif
+//Initialize USB Serial
+#ifndef SERIAL_BEGIN
+#define SERIAL_BEGIN
+	Serial.begin(BAUD_RATE);
+#endif
 #endif
 }
 
@@ -181,8 +181,8 @@ void SerialWIFI::returnCodes(int codeID)
 		Serial.println(F("ERROR_SERIAL_OUTPUT"));
 		break;
 	case 10: // RESET
+		resetASCD = true;
 		Serial.println(F("RESET"));
-		// reboot();
 		break;
 	default:
 		if (codeID >= 100 && codeID < 200)
@@ -201,12 +201,24 @@ void SerialWIFI::returnCodes(int codeID)
 			Serial.println(moduleID);
 			break;
 		}
+		else if (codeID >= 300 && codeID < 400)
+		{
+			moduleID = codeID - 300;
+			restartCycle[moduleID] = true; // Returned from Battery Portal that the cycle should be restarted for a retest.
+			Serial.print(F("RESTART_CYCLE_"));
+			Serial.println(moduleID);
+			break;
+		}
 		else
 		{
 			Serial.println(F("UKNOWN"));
 			break;
 		}
 	}
+}
+
+bool SerialWIFI::getResetASCD(){
+	return resetASCD;
 }
 
 void SerialWIFI::insertDataFlag(byte module)
@@ -219,14 +231,24 @@ bool SerialWIFI::getBarcodeScanned(byte module)
 	return barcodeScanned[module];
 }
 
-void SerialWIFI::resetBarcodeScanned(byte module)
+bool SerialWIFI::getRestartCycle(byte module)
 {
-	barcodeScanned[module] = false;
+	return restartCycle[module];
 }
 
 bool SerialWIFI::getInsertDataFlag(byte module)
 {
 	return insertData[module];
+}
+
+void SerialWIFI::resetBarcodeScanned(byte module)
+{
+	barcodeScanned[module] = false;
+}
+
+void SerialWIFI::resetRestartCycle(byte module)
+{
+	restartCycle[module] = false;
 }
 
 void SerialWIFI::resetInsertDataFlag(byte module)

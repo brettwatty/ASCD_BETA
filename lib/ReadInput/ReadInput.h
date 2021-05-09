@@ -2,7 +2,6 @@
 #define READ_INPUT__H
 
 #include <Config.h>
-#include <ConfigEEPROM.h>
 #include <Arduino.h>
 
 #if defined(ASCD_LEONARDO_4X)
@@ -68,7 +67,6 @@ private:
     float readVcc();
 #endif
 
-    ConfigEEPROM configEEPROM;
     Config config;
 
 public:

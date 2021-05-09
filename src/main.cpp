@@ -13,6 +13,7 @@ SetupTempSensorSerials setupTempSensorSerials;
 #include <SetupChargeLEDMidVoltage.h>
 SetupChargeLEDMidVoltage setupChargeLEDMidVoltage;
 #elif (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
+#include <avr/wdt.h>
 #include <CycleFunctions.h>
 Cycle cycle;
 #endif
@@ -28,6 +29,8 @@ void setup()
 #elif defined(SETUP_CHARGE_LED_MID_VOLTAGE)
     setupChargeLEDMidVoltage.init();
 #elif (defined(ASCD_NANO_4X) || defined(ASCD_LEONARDO_4X) || defined(ASCD_MEGA_8X))
+    MCUSR = 0;
+    wdt_disable();
     cycle.init();
 #endif
 }

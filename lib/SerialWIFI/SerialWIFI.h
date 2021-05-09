@@ -16,6 +16,8 @@ private:
 
     bool barcodeScanned[MODULES_COUNT];
     bool insertData[MODULES_COUNT];
+    bool restartCycle[MODULES_COUNT];
+    bool resetASCD = false;
 
     // Private Class Functions
 
@@ -36,9 +38,12 @@ public:
     void batteryDischargeSerial(byte module, byte hours, byte minutes, byte seconds, byte batteryInitialTemp, int batteryInitialVoltage, byte batteryTemp, int batteryVoltage, int dischargeAmps, int dischargeMilliamps, byte batteryHighestTemp, int milliOhms);
     void completeSerial(byte module, byte faultCode, int batteryVoltage);
     bool getBarcodeScanned(byte module);
+    bool getRestartCycle(byte module);
+    void resetRestartCycle(byte module);
     void resetBarcodeScanned(byte module);
     void insertDataFlag(byte module);
     bool getInsertDataFlag(byte module);
+    bool getResetASCD();
     void resetInsertDataFlag(byte module);
 };
 
